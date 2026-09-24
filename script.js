@@ -107,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="badge ${status.class}">${status.label}</span>
                         </div>
                         <div class="game-date">อัปเดตล่าสุด: ${formatDate(game.updatedAt)}</div>
-                        ${game.developer ? `<div class="game-date">ผู้พัฒนา: ${game.developer}</div>` : ''}
                         ${playButtonHtml}
                     </div>
                 </div>
