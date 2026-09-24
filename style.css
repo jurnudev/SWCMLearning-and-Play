@@ -566,6 +566,7 @@ button {
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s, box-shadow 0.2s;
     min-width: 220px;
+    text-align: left;
 }
 
 .developer-card:hover {
@@ -576,10 +577,11 @@ button {
 .developer-avatar {
     width: 48px;
     height: 48px;
+    min-width: 48px;
     border-radius: 9999px;
     background: linear-gradient(135deg, var(--primary-color), #7C3AED);
     color: white;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
@@ -587,15 +589,22 @@ button {
     flex-shrink: 0;
 }
 
+.developer-info {
+    display: flex;
+    flex-direction: column;
+}
+
 .developer-name {
     font-weight: 600;
     color: var(--text-primary);
+    white-space: nowrap;
 }
 
 .developer-role {
     font-size: 0.875rem;
     color: var(--text-secondary);
     margin-top: 0.125rem;
+    white-space: nowrap;
 }
 
 /* Footer */
