@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 3.2 - Professional Remote Workflow</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4 { color: #111827; }
+        .cover-img {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+        .intro-text {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+        }
+        .step-title {
+            margin: 0;
+            font-size: 1.15rem;
+            color: #111827;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .danger-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .tip-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #475569;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+        .terminal-header {
+            background-color: #374151;
+            color: #9ca3af;
+            padding: 0.4rem 1rem;
+            border-radius: 6px 6px 0 0;
+            font-size: 0.8rem;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 0 0 6px 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+        .code-comment { color: #6a9955; }
+        .code-cmd { color: #569cd6; }
+        .code-arg { color: #ce9178; }
+        .code-flag { color: #9cdcfe; }
+
+        .meaning-list {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0;
+        }
+        .meaning-list li {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95rem;
+        }
+        .meaning-list li:last-child { border-bottom: none; }
+        code {
+            background: #f1f5f9;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.88em;
+            color: #1e40af;
+        }
+
+        /* Flowchart */
+        .flowchart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0;
+            margin: 1.5rem 0;
+        }
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .flow-box {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 100px;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.25);
+        }
+        .flow-sub {
+            font-size: 0.7rem;
+            color: #6b7280;
+            margin-top: 0.3rem;
+        }
+        .flow-arrow {
+            color: #9ca3af;
+            font-size: 1.4rem;
+            padding: 0 0.3rem;
+            line-height: 1;
+        }
+
+        .important-badge {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .placeholder-img {
+            width: 100%;
+            height: 200px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 14px;
+            border: 2px dashed #cbd5e1;
+        }
+        .step-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .step-list { padding-left: 1.2rem; }
+        .step-list li { margin-bottom: 0.5rem; }
+        .cycle-item {
+            border-left: 4px solid #2563eb;
+            background: #f8fafc;
+            padding: 0.75rem 1rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 0.75rem;
+        }
+        .cycle-item h4 { margin: 0 0 0.25rem 0; color: #1d4ed8; }
+        .cycle-item p { margin: 0; }
+        .check-list { list-style: none; padding: 0; margin: 0; }
+        .check-list li { padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+        .check-list li:last-child { border-bottom: none; }
+        kbd {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-bottom-width: 2px;
+            border-radius: 4px;
+            padding: 0.05rem 0.4rem;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep3-2.jpg" alt="หน้าปก EP3.2 - Professional Remote Workflow">
+
+    <h1 class="hero-title">Lesson 3.2</h1>
+    <h2 style="text-align: center;">Professional Remote Workflow</h2>
+    <p class="subtitle">"เชื่อมต่อคอมพิวเตอร์กับหุ่นยนต์ ให้เป็นหนึ่งเดียวด้วย VS Code"</p>
+    <p class="intro-text">
+        ใน EP นี้เราจะหยุดการถอด SD Card หรือการต่อจอแยกให้ Raspberry Pi<br>
+        แต่เราจะใช้ <strong>Remote-SSH</strong> เพื่อควบคุมทุกอย่างจากหน้าจอคอมพิวเตอร์เครื่องเดียว!
+    </p>
+
+    <!-- Step 1 -->
+    <div class="section-box">
+        <div class="step-header">
+            <div class="step-number">1</div>
+            <h3 class="step-title">ตามหาที่อยู่หุ่นยนต์ (Finding IP Address)</h3>
+        </div>
+        <p>ก่อนจะเชื่อมต่อได้ เราต้องรู้ก่อนว่า Raspberry Pi ของเราอยู่ที่ไหนในวงเครือข่าย <strong>(WiFi เดียวกัน)</strong></p>
+        <div class="location-badge">
+            📍 พิมพ์ที่: Terminal บน Raspberry Pi (หรือต่อจอครั้งสุดท้าย)
+        </div>
+        <div class="terminal-header">
+            <div class="terminal-dot" style="background:#ef4444;"></div>
+            <div class="terminal-dot" style="background:#f59e0b;"></div>
+            <div class="terminal-dot" style="background:#22c55e;"></div>
+            Terminal
+        </div>
+        <div class="code-block"><span class="code-cmd">hostname</span> <span class="code-flag">-I</span></div>
+        <p>ผลลัพธ์จะเป็นตัวเลข เช่น <code>192.168.1.45</code> นั่นคือ <strong>"บ้านเลขที่"</strong> ของหุ่นยนต์เรา</p>
+        <div class="tip-box">
+            <strong>💡 Tip:</strong> แนะนำให้ใช้แอป <strong>Fing</strong> ในมือถือ หรือโปรแกรม <strong>Advanced IP Scanner</strong> เพื่อหา IP ของ Pi ได้โดยไม่ต้องต่อจอครับ
+        </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="section-box">
+        <div class="step-header">
+            <div class="step-number">2</div>
+            <h3 class="step-title">ติดตั้งเครื่องมือ Remote-SSH</h3>
+        </div>
+        <ol class="step-list">
+            <li>เปิด Visual Studio Code บนคอมพิวเตอร์ของคุณ (Client)</li>
+            <li>ไปที่เมนู <strong>Extensions</strong> (รูปสี่เหลี่ยมด้านซ้ายมือ)</li>
+            <li>ค้นหาคำว่า <strong>"Remote - SSH"</strong> โดย Microsoft แล้วกด <strong>Install</strong></li>
+        </ol>
+        <img class="step-img" src="../../assets/lessons/ep3-2-install-remote-ssh.jpg" alt="ติดตั้ง Remote - SSH ใน VS Code: 1 เปิด Extensions, 2 ค้นหา, 3 กด Install">
+        <img class="step-img" src="../../assets/lessons/ep3-2-ssh-connection.jpg" alt="คอมพิวเตอร์เชื่อมต่อกับ Raspberry Pi ผ่าน SSH ในวง WiFi เดียวกัน">
+    </div>
+
+    <!-- Step 3 -->
+    <div class="section-box">
+        <div class="step-header">
+            <div class="step-number">3</div>
+            <h3 class="step-title">เริ่มการเชื่อมต่อ (Establishing Connection)</h3>
+        </div>
+        <ol class="step-list">
+            <li>กดปุ่มสีน้ำเงินเล็กๆ มุมซ้ายล่างของ VS Code <code>&gt;&lt;</code></li>
+            <li>เลือก <strong>Connect to Host...</strong> → <strong>Add New SSH Host...</strong></li>
+            <li>พิมพ์คำสั่ง: <code>ssh [ชื่อuser]@[เลขIP]</code></li>
+        </ol>
+        <div class="terminal-header">
+            <div class="terminal-dot" style="background:#ef4444;"></div>
+            <div class="terminal-dot" style="background:#f59e0b;"></div>
+            <div class="terminal-dot" style="background:#22c55e;"></div>
+            SSH Command
+        </div>
+        <div class="code-block"><span class="code-cmd">ssh</span> <span class="code-arg">pi@192.168.1.45</span></div>
+        <ol class="step-list" start="4">
+            <li>เลือกไฟล์ Config ตัวแรก แล้วกด <strong>Connect</strong> ที่มุมขวาล่าง</li>
+            <li>ใส่รหัสผ่านของ Raspberry Pi <em>(ค่าเริ่มต้นมักจะเป็น <code>ubuntu</code> หรือตามที่อาจารย์ตั้งไว้)</em></li>
+        </ol>
+    </div>
+
+    <!-- Workflow -->
+    <div class="section-box">
+        <h3>🔄 วงจรการทำงาน: เขียนที่เครื่อง รันที่หุ่น</h3>
+        <p>เมื่อเชื่อมต่อสำเร็จ คุณจะเห็นชื่อ <code>SSH: [IP]</code> ที่มุมล่างซ้าย ต่อไปนี้คือขั้นตอนการทำงานจริง:</p>
+
+        <div class="cycle-item">
+            <h4>1. Write &amp; Save</h4>
+            <p>เขียนโค้ดใน VS Code แล้วกด Save ไฟล์จะถูกบันทึกที่ Raspberry Pi ทันที</p>
+        </div>
+        <div class="cycle-item">
+            <h4>2. Build</h4>
+            <p>เปิด Terminal ใน VS Code (<kbd>Ctrl</kbd> + <kbd>`</kbd>) แล้วสั่ง <code>colcon build</code> บนตัวหุ่น</p>
+        </div>
+        <div class="cycle-item">
+            <h4>3. Run</h4>
+            <p>ใช้ Terminal เดียวกันสั่ง <code>ros2 run</code> เพื่อดูหุ่นยนต์เคลื่อนที่!</p>
+        </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="section-box">
+        <h3>🏆 สรุป: ทำไมเราถึงต้องใช้เครื่องมือนี้?</h3>
+        <ul class="check-list">
+            <li>✔ ไม่ต้องพกจอ คีย์บอร์ด เม้าส์ ไปที่ตัวหุ่นยนต์</li>
+            <li>✔ เขียนโค้ดได้รวดเร็วด้วยฟีเจอร์ Auto-complete ของ VS Code</li>
+            <li>✔ เปิด Terminal ได้หลายหน้าพร้อมกันเพื่อดู Log หลายๆ Node</li>
+            <li>✔ บริหารจัดการไฟล์ในหุ่นยนต์ได้ง่ายเหมือนใช้ Windows Explorer</li>
+        </ul>
+    </div>
+
+</body>
+</html>
