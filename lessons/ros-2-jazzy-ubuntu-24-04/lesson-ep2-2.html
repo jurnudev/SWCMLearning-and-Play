@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP2.2 - ติดตั้ง Ubuntu 24.04 บน Windows ด้วย WSL 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4 { color: #111827; }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th { background-color: #f3f4f6; }
+    </style>
+</head>
+<body>
+
+    <h1 class="hero-title">EP2.2</h1>
+    <h2 style="text-align: center;">ติดตั้ง Ubuntu 24.04 บน Windows ด้วย WSL 2</h2>
+    <p class="subtitle">"ตั้งค่า WSL 2 → ติดตั้ง Ubuntu 24.04 LTS → ติดตั้ง ROS 2 Jazzy → ทดสอบระบบอย่างครบขั้นตอน"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>ติดตั้งและตรวจสอบ WSL 2 กับ Ubuntu 24.04 LTS ได้</li>
+            <li>ติดตั้ง ROS 2 Jazzy จากแพ็กเกจ deb ตามขั้นตอนปัจจุบันได้</li>
+            <li>ทดสอบ talker/listener และวิเคราะห์ปัญหาพื้นฐานได้</li>
+            <li>เข้าใจข้อจำกัดของ WSL ก่อนนำไปใช้กับหุ่นยนต์จริง</li>
+        </ul>
+        <div class="highlight">
+            <strong>ก่อนเริ่ม:</strong><br>
+            ใช้ Windows 11 หรือ Windows 10 รุ่นที่รองรับ WSL 2 เปิด PowerShell หรือ Windows Terminal แบบ <em>Run as administrator</em> เฉพาะขั้นตอนติดตั้ง WSL เท่านั้น
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>💻 1. ติดตั้ง WSL 2 และ Ubuntu 24.04</h3>
+        <p><strong>PowerShell (Administrator)</strong></p>
+        <div class="code-block">
+wsl --update<br>
+wsl --set-default-version 2<br>
+wsl --install -d Ubuntu-24.04
+        </div>
+        <p>Restart Windows หากระบบร้องขอ จากนั้นเปิด Ubuntu 24.04 จาก Start Menu และตั้ง UNIX username กับ password ขณะพิมพ์รหัสผ่านจะไม่มีอักขระแสดงบนหน้าจอ ซึ่งเป็นพฤติกรรมปกติ</p>
+
+        <p><strong>ตรวจสอบจาก PowerShell</strong></p>
+        <div class="code-block">
+wsl --status<br>
+wsl --list --verbose
+        </div>
+        <div class="highlight">
+            <strong>✅ Expected Result:</strong><br>
+            รายการ Ubuntu-24.04 แสดง VERSION เป็น 2 ถ้าเป็น 1 ให้รัน:<br>
+            <code>wsl --set-version Ubuntu-24.04 2</code>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>🐧 2. เตรียม Ubuntu</h3>
+        <p>คำสั่งต่อจากนี้ให้รันใน Terminal ของ Ubuntu ไม่ใช่ PowerShell</p>
+        <div class="code-block">
+# ตรวจรุ่นระบบ<br>
+cat /etc/os-release<br>
+uname -m<br>
+<br>
+# อัปเดตแพ็กเกจ<br>
+sudo apt update<br>
+sudo apt upgrade -y<br>
+<br>
+# ตั้ง Locale UTF-8<br>
+sudo apt install locales -y<br>
+sudo locale-gen en_US en_US.UTF-8<br>
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8<br>
+export LANG=en_US.UTF-8<br>
+locale
+        </div>
+        <div class="highlight">
+            <strong>✅ Expected Result:</strong><br>
+            /etc/os-release ต้องเป็น Ubuntu 24.04 (Noble) และ locale ต้องแสดง UTF-8
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>🤖 3. เพิ่ม ROS 2 apt Repository</h3>
+        <p>ใช้แพ็กเกจ ros2-apt-source เพื่อจัดการ key และ source configuration ให้ระบบอัปเดตได้ง่ายกว่าวิธีดาวน์โหลด ros.key แบบเดิม</p>
+        <div class="code-block">
+sudo apt install software-properties-common curl -y<br>
+sudo add-apt-repository universe -y<br>
+sudo apt update<br>
+<br>
+export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}')<br>
+<br>
+curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"<br>
+<br>
+sudo dpkg -i /tmp/ros2-apt-source.deb<br>
+sudo apt update
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>📦 4. ติดตั้ง ROS 2 Jazzy</h3>
+        <p><strong>Desktop — แนะนำสำหรับเครื่องเรียน</strong></p>
+        <div class="code-block">
+sudo apt install ros-jazzy-desktop ros-dev-tools -y
+        </div>
+        <p><strong>ROS-Base — สำหรับระบบไม่มี GUI</strong></p>
+        <div class="code-block">
+sudo apt install ros-jazzy-ros-base ros-dev-tools -y
+        </div>
+        <div class="highlight">
+            <strong>Gazebo ไม่ได้หมายความว่าพร้อมใช้เพียงเพราะติดตั้ง ros-jazzy-desktop</strong><br>
+            ROS Desktop ประกอบด้วย ROS, RViz2, demos และ tutorials ส่วน Gazebo ต้องติดตั้งตามชุดที่เข้ากับ ROS 2 Jazzy เช่น Gazebo Harmonic และ ros_gz ตามบท Simulation โดยแยกต่างหาก
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚙️ 5. ตั้งค่า Environment</h3>
+        <div class="code-block">
+# ใช้กับ Terminal ปัจจุบัน<br>
+source /opt/ros/jazzy/setup.bash<br>
+<br>
+# เพิ่มอัตโนมัติเมื่อเปิด Bash ครั้งถัดไป<br>
+echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc<br>
+source ~/.bashrc<br>
+<br>
+# ตรวจสอบ<br>
+echo $ROS_DISTRO<br>
+ros2 --help
+        </div>
+        <div class="highlight">
+            <strong>✅ Expected Result:</strong><br>
+            echo $ROS_DISTRO แสดง jazzy และ ros2 --help แสดงรายการคำสั่ง
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 6. ทดสอบ Talker/Listener</h3>
+        <p><strong>Terminal 1</strong></p>
+        <div class="code-block">
+source /opt/ros/jazzy/setup.bash<br>
+ros2 run demo_nodes_cpp talker
+        </div>
+        <p><strong>Terminal 2</strong></p>
+        <div class="code-block">
+source /opt/ros/jazzy/setup.bash<br>
+ros2 run demo_nodes_py listener
+        </div>
+        <div class="highlight">
+            <strong>✅ Expected Result:</strong><br>
+            Talker ส่งข้อความ และ Listener แสดง I heard พร้อมเลขลำดับต่อเนื่อง กด Ctrl+C เพื่อหยุดแต่ละ Node
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 7. LAB — ตรวจสอบระบบหลังติดตั้ง</h3>
+        <ul>
+            <li>ใช้ <code>ros2 node list</code> ตรวจว่าเห็น /talker และ /listener</li>
+            <li>ใช้ <code>ros2 topic list -t</code> ตรวจ Topic และ Message Type</li>
+            <li>ใช้ <code>ros2 topic echo /chatter</code> อ่านข้อมูลโดยตรง</li>
+            <li>ใช้ <code>ros2 topic hz /chatter</code> วัดอัตราการส่ง</li>
+        </ul>
+        <div class="code-block">
+ros2 node list<br>
+ros2 topic list -t<br>
+ros2 topic echo /chatter<br>
+ros2 topic hz /chatter
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ 8. Common Problems</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>อาการ</th>
+                    <th>วิธีตรวจ/แก้</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0x8007019e หรือ WSL ไม่ทำงาน</td>
+                    <td>รัน wsl --update, Restart และตรวจ Virtualization ใน BIOS/UEFI</td>
+                </tr>
+                <tr>
+                    <td>Ubuntu เป็น WSL 1</td>
+                    <td>wsl --set-version Ubuntu-24.04 2</td>
+                </tr>
+                <tr>
+                    <td>Unable to locate package ros-jazzy-desktop</td>
+                    <td>ตรวจ Ubuntu ต้องเป็น 24.04, ติดตั้ง ros2-apt-source และ sudo apt update</td>
+                </tr>
+                <tr>
+                    <td>ros2: command not found</td>
+                    <td>source /opt/ros/jazzy/setup.bash</td>
+                </tr>
+                <tr>
+                    <td>GUI หรือ RViz2 เปิดไม่ได้</td>
+                    <td>อัปเดต WSL ด้วย wsl --update และตรวจ WSLg/ไดรเวอร์กราฟิก</td>
+                </tr>
+                <tr>
+                    <td>ต่อ Serial/USB ไม่พบ</td>
+                    <td>WSL ไม่ส่ง USB ทุกชนิดให้อัตโนมัติ ต้องวางแผน USB pass-through หรือรัน Hardware Node บน Linux จริง</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-box">
+        <h3>🔐 9. ข้อควรระวัง</h3>
+        <ul>
+            <li>ไม่ควรรันคำสั่งติดตั้งจากแหล่งที่ไม่ทราบที่มา</li>
+            <li>อย่าผสม ROS 2 Humble กับ Jazzy ใน Environment เดียว</li>
+            <li>WSL เหมาะกับการเรียน CLI, Python และการพัฒนาเบื้องต้น แต่การเชื่อม Hardware/Realtime ควรทดสอบบน Ubuntu จริงหรือ Raspberry Pi ด้วย</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>📝 แบบฝึกหัดท้ายบท</h3>
+        <ol>
+            <li>อธิบายความแตกต่างระหว่าง WSL 1 และ WSL 2</li>
+            <li>คำสั่งใดใช้ตรวจว่า Ubuntu ใช้ WSL เวอร์ชันใด?</li>
+            <li>เหตุใด Jazzy จึงต้องใช้ Ubuntu 24.04 สำหรับ deb packages?</li>
+            <li>บันทึกผล <code>ros2 topic list -t</code> ขณะ talker/listener ทำงาน</li>
+        </ol>
+    </div>
+
+</body>
+</html>

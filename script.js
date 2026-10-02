@@ -72,11 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Create a single Game Card HTML
     const createGameCard = (game) => {
         const status = statusConfig[game.status] || { label: game.status, class: 'badge-category' };
+        const btnText = game.buttonText || 'เล่นเกม';
         
         // Handle missing url
         let playButtonHtml = '';
         if (game.url) {
-            playButtonHtml = `<a href="${game.url}" target="_blank" rel="noopener noreferrer" class="btn-play">เล่นเกม</a>`;
+            playButtonHtml = `<a href="${game.url}" target="_blank" rel="noopener noreferrer" class="btn-play">${btnText}</a>`;
         } else {
             playButtonHtml = `<button class="btn-play disabled" disabled>ยังไม่มีลิงก์เกม</button>`;
         }

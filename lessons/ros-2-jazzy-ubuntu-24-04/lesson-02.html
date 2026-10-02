@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 02 - การติดตั้ง Ubuntu และ ROS 2 Jazzy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4, h5 { color: #111827; }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th { background-color: #f3f4f6; }
+        .placeholder-img {
+            width: 100%;
+            height: 200px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 14px;
+            border: 2px dashed #cbd5e1;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .flex-item {
+            flex: 1 1 300px;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="hero-title">Lesson 02</h1>
+    <h2 style="text-align: center;">การติดตั้ง Ubuntu และ ROS 2 Jazzy</h2>
+    <p class="subtitle">"แยกการติดตั้งระหว่างเครื่องควบคุม (PC) และหุ่นยนต์ (Raspberry Pi)"</p>
+
+    <div class="section-box">
+        <h3>🛠️ ส่วนที่ 1: การลง OS (Ubuntu 24.04 LTS)</h3>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h4>💻 สำหรับ Computer (Client)</h4>
+                <p>ใช้สำหรับเขียนโค้ด, จำลองภาพ (RViz) และควบคุมหุ่นยนต์</p>
+                <ul>
+                    <li>✅ ลงแบบ Ubuntu Desktop (มีหน้าจอ GUI)</li>
+                    <li>✅ พื้นที่แนะนำ 64GB ขึ้นไป</li>
+                    <li>✅ แนะนำให้ลงแบบ Dual Boot หรือเครื่องเปล่า</li>
+                </ul>
+            </div>
+            <div class="flex-item">
+                <h4>🍓 สำหรับ Raspberry Pi (Robot)</h4>
+                <p>ใช้ประมวลผลบนตัวหุ่นยนต์โดยตรง เน้นประหยัดทรัพยากร</p>
+                <ul>
+                    <li>✅ ลงแบบ Ubuntu Server (Command Line เท่านั้น)</li>
+                    <li>✅ MicroSD Card Class 10 (A1/A2) 16GB-32GB</li>
+                    <li>✅ ใช้โปรแกรม Raspberry Pi Imager ในการลง</li>
+                </ul>
+            </div>
+        </div>
+        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ ]</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🤖 ส่วนที่ 2: ขั้นตอนการติดตั้ง ROS 2 Jazzy</h3>
+        <div class="highlight">
+            <strong>💡 คำแนะนำ:</strong> ขั้นตอน A และ B ต้องทำทั้งบนคอมพิวเตอร์ และ Raspberry Pi
+        </div>
+
+        <h4>A - ตั้งค่าภาษาของระบบ (Set Locales)</h4>
+        <div class="code-block">sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8</div>
+
+        <h4>B - เพิ่มแหล่งเก็บซอฟต์แวร์ (Setup Sources)</h4>
+        <div class="code-block">sudo apt install software-properties-common -y
+sudo add-apt-repository universe -y
+sudo apt update && sudo apt install curl -y
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null</div>
+
+        <h4>C - เลือกประเภทการติดตั้งให้เหมาะสม</h4>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h5>💻 Desktop Version (สำหรับ PC)</h5>
+                <p>ติดตั้งครบทุกอย่าง ทั้ง Core, เครื่องมือจำลอง (RViz, Gazebo) และ Tutorial</p>
+                <div class="code-block">sudo apt update
+sudo apt install ros-jazzy-desktop</div>
+            </div>
+            <div class="flex-item">
+                <h5>🍓 ROS-Base (สำหรับ Raspberry Pi)</h5>
+                <p>ติดตั้งเฉพาะหัวใจหลัก ไม่รวม GUI ช่วยประหยัดพื้นที่ SD Card และ CPU</p>
+                <div class="code-block">sudo apt update
+sudo apt install ros-jazzy-ros-base</div>
+            </div>
+        </div>
+
+        <h4>D - ตั้งค่าทางลัด (Environment Setup)</h4>
+        <p>ทำเหมือนกันทั้งสองเครื่อง เพื่อให้พิมพ์คำสั่ง ros2 ได้ทันที:</p>
+        <div class="code-block">echo "source /opt/ros/jazzy/setup.bash" >> ~/.bashrc
+source ~/.bashrc</div>
+    </div>
+
+    <div class="section-box">
+        <h3>📡 ทดสอบการเชื่อมต่อ (DDS Test)</h3>
+        <p><em>"ลองส่งข้อมูลจาก Raspberry Pi มาที่หน้าจอคอมพิวเตอร์"</em></p>
+
+        <p><strong>1. ที่ฝั่ง Raspberry Pi (Robot):</strong><br>
+        สั่งให้หุ่นยนต์ประกาศข้อความ "Hello World"</p>
+        <div class="code-block">ros2 run demo_nodes_cpp talker</div>
+
+        <p><strong>2. ที่ฝั่ง Computer (Desktop):</strong><br>
+        เปิดเครื่องรับฟังข้อความ (ต้องอยู่ในวง WiFi เดียวกัน)</p>
+        <div class="code-block">ros2 run demo_nodes_py listener</div>
+        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ ]</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🎉 การติดตั้งเสร็จสมบูรณ์!</h3>
+        <p>ตอนนี้คุณมีทั้งเครื่องควบคุม (Desktop) และเครื่องประมวลผลบนหุ่นยนต์ (Base) ที่พร้อมทำงานร่วมกันแล้ว</p>
+    </div>
+
+</body>
+</html>

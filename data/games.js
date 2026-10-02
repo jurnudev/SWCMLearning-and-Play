@@ -18,5 +18,16 @@ const games = [
         url: "https://taken89.github.io/hero-rescue-game/?fbclid=IwY2xjawUhc5FleHRuA2FlbQIxMABwZG9mBWJyaWQRMU5uQU9nWEdJdkNKMmE2ZWVzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEeWRt_xnv1i2g8kfXy8mgQs_OByePmfvMPBF2DV-AXbwnYSFFR1neTRPprfHQ_aem_6mIUogZvtiTveiY7q0mE1Q",
         updatedAt: "2026-09-24",
         status: "completed"
+    },
+    {
+        id: "lesson-001",
+        title: "ทำความรู้จัก ROS 2 Jazzy",
+        description: "จาก Humble สู่ Jazzy — ก้าวสำคัญของหุ่นยนต์อัจฉริยะบน Ubuntu 24.04",
+        category: "Robotics",
+        image: "assets/games/ros2-jazzy-cover.jpg",
+        url: "lessons/ros-2-jazzy-ubuntu-24-04/index.html",
+        updatedAt: "2026-10-02",
+        status: "development",
+        buttonText: "เข้าดูบทเรียน"
     }
 ];
