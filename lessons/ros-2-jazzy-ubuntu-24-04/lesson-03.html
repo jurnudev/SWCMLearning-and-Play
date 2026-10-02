@@ -2,143 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>EP3 - Workspace & Remote Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="back-button.css">
-    <style>
-        body {
-            font-family: 'Kanit', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: #f9fafb;
-        }
-        h1, h2, h3, h4 { color: #111827; }
-        .cover-img {
-            display: block;
-            width: 100%;
-            max-width: 520px;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            margin-bottom: 1.5rem;
-        }
-        .hero-title {
-            text-align: center;
-            color: #2563eb;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            text-align: center;
-            color: #4b5563;
-            font-style: italic;
-            margin-bottom: 2rem;
-        }
-        .section-box {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-        }
-        .highlight {
-            background-color: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .alert-box {
-            background-color: #fef2f2;
-            border-left: 4px solid #ef4444;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .code-block {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 1rem;
-            border-radius: 6px;
-            font-family: monospace;
-            overflow-x: auto;
-            margin: 0.75rem 0;
-            white-space: pre-wrap;
-            font-size: 0.9rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        th, td {
-            border: 1px solid #e5e7eb;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th { background-color: #f3f4f6; }
-        .placeholder-img {
-            width: 100%;
-            height: 180px;
-            background-color: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            border-radius: 8px;
-            margin: 1rem 0;
-            font-size: 14px;
-            border: 2px dashed #cbd5e1;
-        }
-        .flex-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .flex-item {
-            flex: 1 1 300px;
-            background: #f8fafc;
-            padding: 1.25rem;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        .step-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background-color: #2563eb;
-            color: white;
-            border-radius: 50%;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-right: 0.5rem;
-        }
-        code {
-            background: #f1f5f9;
-            padding: 0.1rem 0.3rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #1e40af;
-        }
-        .diagram {
-            display: block;
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin: 1rem 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-    </style>
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}</style>
 </head>
 <body>
 
@@ -154,10 +22,10 @@
     <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep3.jpg" alt="หน้าปก EP3 - Workspace &amp; Remote Control">
 
     <h1 class="hero-title">EP3</h1>
-    <h2 style="text-align: center;">Workspace &amp; Remote Control</h2>
+    <h2 style="text-align:center">Workspace &amp; Remote Control</h2>
     <p class="subtitle">"เข้าใจโครงสร้างพื้นที่ทำงาน และการเขียนโค้ดแบบ Live บนหุ่นยนต์"</p>
 
-    <!-- Section 1 -->
+    
     <div class="section-box">
         <h3>1. เข้าใจหลักการ "พื้นที่ทำงานแยกส่วน"</h3>
         <div class="alert-box">
@@ -180,7 +48,7 @@
         <img class="diagram" src="../../assets/lessons/ep3-client-vs-host.png" alt="Workspace บน Laptop และบน Raspberry Pi แยกกัน ไม่ส่งข้อมูลให้อัตโนมัติ">
     </div>
 
-    <!-- Section 2 -->
+    
     <div class="section-box">
         <h3>2. เทคนิคการเขียนโค้ดแบบ Live (VS Code Remote-SSH)</h3>
         <p>เรามีทางเลือก 2 ทางในการพัฒนาโปรเจกต์ครับ:</p>
@@ -201,7 +69,7 @@
         <img class="diagram" src="../../assets/lessons/ep3-vscode-remote.png" alt="ขั้นตอนเชื่อมต่อด้วย VS Code Remote - SSH Extension">
     </div>
 
-    <!-- Section 3 -->
+    
     <div class="section-box">
         <h3>3. โครงสร้าง Colcon Workspace</h3>
         <p>พื้นที่ทำงานของ ROS 2 จะใช้ระบบที่เรียกว่า <code>colcon</code> โดยเราต้องสร้างโฟลเดอร์หลักขึ้นมาดังนี้:</p>
@@ -240,7 +108,7 @@ colcon build</div>
         </div>
     </div>
 
-    <!-- Section 4 -->
+    
     <div class="section-box">
         <h3>4. คำสั่ง Terminal ที่ใช้บ่อย</h3>
         <table>
@@ -271,7 +139,7 @@ colcon build</div>
         </table>
     </div>
 
-    <!-- Summary -->
+    
     <div class="section-box">
         <h3>🏁 สรุปใจความสำคัญ</h3>
         <div class="highlight">

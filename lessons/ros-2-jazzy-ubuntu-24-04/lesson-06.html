@@ -2,158 +2,11 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>EP6 - ROS 2 Launch Files</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="back-button.css">
-    <style>
-        body {
-            font-family: 'Kanit', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: #f9fafb;
-        }
-        h1, h2, h3, h4 { color: #111827; }
-        .cover-img {
-            display: block;
-            width: 100%;
-            max-width: 520px;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            margin-bottom: 1.5rem;
-        }
-        .hero-title {
-            text-align: center;
-            color: #2563eb;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            text-align: center;
-            color: #4b5563;
-            font-style: italic;
-            margin-bottom: 2rem;
-        }
-        .section-box {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-        }
-        .highlight {
-            background-color: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .alert-box {
-            background-color: #fef2f2;
-            border-left: 4px solid #ef4444;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .code-block {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 1rem;
-            border-radius: 6px;
-            font-family: monospace;
-            overflow-x: auto;
-            margin: 0.75rem 0;
-            white-space: pre-wrap;
-            font-size: 0.9rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        th, td {
-            border: 1px solid #e5e7eb;
-            padding: 0.75rem;
-            text-align: left;
-        }
-        th { background-color: #f3f4f6; }
-        .placeholder-img {
-            width: 100%;
-            height: 180px;
-            background-color: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            border-radius: 8px;
-            margin: 1rem 0;
-            font-size: 14px;
-            border: 2px dashed #cbd5e1;
-        }
-        .flex-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .flex-item {
-            flex: 1 1 300px;
-            background: #f8fafc;
-            padding: 1.25rem;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-        .step-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            background-color: #2563eb;
-            color: white;
-            border-radius: 50%;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-right: 0.5rem;
-        }
-        code {
-            background: #f1f5f9;
-            padding: 0.1rem 0.3rem;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #1e40af;
-        }
-            .success-box {
-            background-color: #f0fdf4;
-            border-left: 4px solid #22c55e;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-        .lab-box {
-            background-color: #fffbeb;
-            border: 2px dashed #f59e0b;
-            padding: 1.25rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-        }
-        .table-wrap { overflow-x: auto; }
-        .diagram {
-            display: block;
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin: 1rem 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-    </style>
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.success-box{background-color:#f0fdf4;border-left:4px solid #22c55e;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.lab-box{background-color:#fffbeb;border:2px dashed #f59e0b;padding:1.25rem;border-radius:8px;margin:1rem 0}.table-wrap{overflow-x:auto}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}</style>
 </head>
 <body>
 
@@ -168,7 +21,7 @@
     <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep6.jpg" alt="หน้าปก EP6 - ROS 2 Launch Files">
 
     <h1 class="hero-title">EP6</h1>
-    <h2 style="text-align: center;">ROS 2 Launch Files</h2>
+    <h2 style="text-align:center">ROS 2 Launch Files</h2>
     <p class="subtitle">"เจาะลึกการทำงานของสคริปต์สั่งรันอัตโนมัติ"</p>
 
     <div class="section-box">
