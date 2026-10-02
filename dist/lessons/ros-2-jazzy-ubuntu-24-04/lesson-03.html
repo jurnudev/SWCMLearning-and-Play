@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EP3 - Workspace & Remote Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}</style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep3.jpg" alt="หน้าปก EP3 - Workspace &amp; Remote Control">
+
+    <h1 class="hero-title">EP3</h1>
+    <h2 style="text-align:center">Workspace &amp; Remote Control</h2>
+    <p class="subtitle">"เข้าใจโครงสร้างพื้นที่ทำงาน และการเขียนโค้ดแบบ Live บนหุ่นยนต์"</p>
+
+    
+    <div class="section-box">
+        <h3>1. เข้าใจหลักการ "พื้นที่ทำงานแยกส่วน"</h3>
+        <div class="alert-box">
+            <strong>⚠️ ข้อควรระวังที่มือใหม่มักสับสน!</strong><br>
+            ในโลกของ ROS 2 พื้นที่ทำงาน หรือ Workspace ที่เราสร้างขึ้นบนเครื่องคอมพิวเตอร์ (Client)
+            จะ<strong>ไม่</strong>ส่งข้อมูลไปที่หุ่นยนต์ (Raspberry Pi) โดยอัตโนมัติ
+        </div>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h4>💻 ฝั่ง Client (Laptop)</h4>
+                <p>โค้ดที่เขียนที่นี่ จะถูกเก็บไว้ใน <strong>Hard Drive</strong> ของคอมพิวเตอร์
+                ใช้สำหรับทดสอบจำลอง (Simulation) เท่านั้น</p>
+            </div>
+            <div class="flex-item">
+                <h4>🍓 ฝั่ง Host (Raspberry Pi)</h4>
+                <p>โค้ดที่ต้องการให้หุ่นยนต์วิ่งจริง ต้องถูกเก็บไว้ใน <strong>SD Card</strong>
+                ของ Raspberry Pi เท่านั้น</p>
+            </div>
+        </div>
+        <img class="diagram" src="../../assets/lessons/ep3-client-vs-host.png" alt="Workspace บน Laptop และบน Raspberry Pi แยกกัน ไม่ส่งข้อมูลให้อัตโนมัติ">
+    </div>
+
+    
+    <div class="section-box">
+        <h3>2. เทคนิคการเขียนโค้ดแบบ Live (VS Code Remote-SSH)</h3>
+        <p>เรามีทางเลือก 2 ทางในการพัฒนาโปรเจกต์ครับ:</p>
+
+        <h4>ทางเลือกที่ 1: เขียนบน PC แล้วค่อย Upload (สำหรับผู้เริ่มต้น)</h4>
+        <p>ถ้า Raspberry Pi ยังไม่พร้อม หรือยังไม่ได้ลงระบบ ให้เขียนและทดสอบบนคอมพิวเตอร์ไปก่อน
+        จากนั้นค่อยใช้คำสั่ง <code>scp</code> หรือแฟลชไดร์ฟก๊อปปี้ไปวางที่หุ่นยนต์ภายหลัง</p>
+
+        <h4>ทางเลือกที่ 2: Remote-SSH (วิธีแนะนำแบบมืออาชีพ)</h4>
+        <p>ใช้โปรแกรม Visual Studio Code ติดตั้งส่วนขยาย <strong>"Remote - SSH"</strong>
+        เพื่อเชื่อมต่อจากคอมพิวเตอร์เข้าไปยัง Raspberry Pi โดยตรง</p>
+        <ul>
+            <li>✅ เขียนโค้ดบนจอคอมพิวเตอร์ที่ลื่นไหล แต่ไฟล์เซฟลงบนตัวหุ่นยนต์ทันที</li>
+            <li>✅ ไม่ต้องต่อจอมอนิเตอร์ คีย์บอร์ด แยกให้ Raspberry Pi</li>
+            <li>✅ แก้โค้ดแล้ว Build บนหุ่นยนต์ได้แบบ Real-time</li>
+        </ul>
+        <img class="diagram" src="../../assets/lessons/ep3-remote-ssh-overview.png" alt="VS Code เชื่อมต่อเข้า Raspberry Pi ผ่าน Remote-SSH โดยไฟล์ถูกเซฟลงบนหุ่นยนต์ทันที">
+        <img class="diagram" src="../../assets/lessons/ep3-vscode-remote.png" alt="ขั้นตอนเชื่อมต่อด้วย VS Code Remote - SSH Extension">
+    </div>
+
+    
+    <div class="section-box">
+        <h3>3. โครงสร้าง Colcon Workspace</h3>
+        <p>พื้นที่ทำงานของ ROS 2 จะใช้ระบบที่เรียกว่า <code>colcon</code> โดยเราต้องสร้างโฟลเดอร์หลักขึ้นมาดังนี้:</p>
+        <div class="code-block"># สร้างโฟลเดอร์สำหรับทำงาน (แนะนำชื่อ ros2_ws)
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws
+colcon build  # สั่งสร้างโครงสร้างครั้งแรก</div>
+
+        <div class="flex-container">
+            <div class="flex-item">
+                <h4>📁 /src</h4>
+                <p><em>"แหล่งรวมโค้ดต้นฉบับ"</em></p>
+                <p>📍 <strong>จุดเดียวที่คุณต้องแก้ไข</strong><br>
+                โค้ด Python/C++ ของเราจะอยู่ที่นี่ทั้งหมด</p>
+            </div>
+            <div class="flex-item">
+                <h4>📁 /build &amp; /install</h4>
+                <p><em>"ไฟล์ระบบที่เกิดจากการคอมไพล์"</em></p>
+                <p>ห้ามแก้ไขไฟล์ในโฟลเดอร์เหล่านี้ด้วยตัวเอง เพราะระบบจะสร้างขึ้นใหม่ทุกครั้งที่สั่ง build</p>
+            </div>
+        </div>
+
+        <div class="highlight">
+            <h4>🚀 ข้อควรจำ: กฎเหล็กของ Workspace</h4>
+
+            <p><span class="step-badge">1</span> <strong>ต้อง colcon build ที่ Root เท่านั้น</strong><br>
+            ห้ามสั่ง build ภายในโฟลเดอร์ src หรือโฟลเดอร์ย่อยเด็ดขาด</p>
+            <div class="code-block">cd ~/ros2_ws  # เข้ามาที่โฟลเดอร์นอกสุดก่อนเสมอ
+colcon build</div>
+
+            <p><span class="step-badge">2</span> <strong>ต้อง Source ไฟล์หลัง Build ทุกครั้ง</strong><br>
+            เพื่อให้ระบบ ROS รู้ว่ามีโค้ดใหม่หรือ Package ใหม่เกิดขึ้น</p>
+            <div class="code-block">source install/setup.bash</div>
+
+            <p>💡 <em>เคล็ดลับ: ถ้าเปิด Terminal หน้าต่างใหม่ อย่าลืมสั่ง source ก่อนใช้งานเสมอ!</em></p>
+        </div>
+    </div>
+
+    
+    <div class="section-box">
+        <h3>4. คำสั่ง Terminal ที่ใช้บ่อย</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>คำสั่ง</th>
+                    <th>หน้าที่</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>colcon build</code></td>
+                    <td>คอมไพล์โค้ด (สั่งงานที่ Root ของ Workspace เท่านั้น)</td>
+                </tr>
+                <tr>
+                    <td><code>source install/setup.bash</code></td>
+                    <td>อัปเดตระบบให้รู้จักโค้ดล่าสุด (สั่งหลัง build เสร็จ)</td>
+                </tr>
+                <tr>
+                    <td><code>ros2 pkg create --build-type ...</code></td>
+                    <td>สร้าง Package ใหม่ (ต้องทำภายในโฟลเดอร์ src)</td>
+                </tr>
+                <tr>
+                    <td><code>ros2 run [package] [node]</code></td>
+                    <td>สั่งให้หุ่นยนต์เริ่มทำงาน</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    
+    <div class="section-box">
+        <h3>🏁 สรุปใจความสำคัญ</h3>
+        <div class="highlight">
+            <p><em>"จำไว้ว่า โค้ดอยู่ที่ไหน งานทำงานอยู่ที่นั่น"</em><br>
+            หากต้องการให้หุ่นยนต์ฉลาดขึ้น เราต้องส่งโค้ดไปรันที่สมองของมันโดยตรง
+            การฝึกใช้ Remote-SSH จะช่วยให้อาจารย์และนักเรียนทำงานได้สะดวกขึ้นหลายเท่าตัวครับ</p>
+        </div>
+    </div>
+
+</body>
+</html>

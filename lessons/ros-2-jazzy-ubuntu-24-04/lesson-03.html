@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 03 - Workspace & Remote Control</title>
+    <title>EP3 - Workspace & Remote Control</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -129,13 +130,30 @@
             font-size: 0.9em;
             color: #1e40af;
         }
+        .diagram {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
 
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+
     <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep3.jpg" alt="หน้าปก EP3 - Workspace &amp; Remote Control">
 
-    <h1 class="hero-title">Lesson 03</h1>
+    <h1 class="hero-title">EP3</h1>
     <h2 style="text-align: center;">Workspace &amp; Remote Control</h2>
     <p class="subtitle">"เข้าใจโครงสร้างพื้นที่ทำงาน และการเขียนโค้ดแบบ Live บนหุ่นยนต์"</p>
 
@@ -159,7 +177,7 @@
                 ของ Raspberry Pi เท่านั้น</p>
             </div>
         </div>
-        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ ]</div>
+        <img class="diagram" src="../../assets/lessons/ep3-client-vs-host.png" alt="Workspace บน Laptop และบน Raspberry Pi แยกกัน ไม่ส่งข้อมูลให้อัตโนมัติ">
     </div>
 
     <!-- Section 2 -->
@@ -179,8 +197,8 @@
             <li>✅ ไม่ต้องต่อจอมอนิเตอร์ คีย์บอร์ด แยกให้ Raspberry Pi</li>
             <li>✅ แก้โค้ดแล้ว Build บนหุ่นยนต์ได้แบบ Real-time</li>
         </ul>
-        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ — Remote-SSH Overview ]</div>
-        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ — VS Code Remote Extension ]</div>
+        <img class="diagram" src="../../assets/lessons/ep3-remote-ssh-overview.png" alt="VS Code เชื่อมต่อเข้า Raspberry Pi ผ่าน Remote-SSH โดยไฟล์ถูกเซฟลงบนหุ่นยนต์ทันที">
+        <img class="diagram" src="../../assets/lessons/ep3-vscode-remote.png" alt="ขั้นตอนเชื่อมต่อด้วย VS Code Remote - SSH Extension">
     </div>
 
     <!-- Section 3 -->

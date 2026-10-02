@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EP13 - SLAM Toolbox — สร้างแผนที่</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.success-box{background-color:#f0fdf4;border-left:4px solid #22c55e;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.lab-box{background-color:#fffbeb;border:2px dashed #f59e0b;padding:1.25rem;border-radius:8px;margin:1rem 0}.table-wrap{overflow-x:auto}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}.formula{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem 1rem;margin:1rem 0;overflow-x:auto}</style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep13.jpg" alt="หน้าปก EP13 - SLAM Toolbox — สร้างแผนที่">
+
+    <h1 class="hero-title">EP13</h1>
+    <h2 style="text-align:center">SLAM Toolbox — สร้างแผนที่</h2>
+    <p class="subtitle">"ให้หุ่นยนต์วาดแผนที่ห้องเองด้วย LiDAR"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>อธิบายแนวคิด SLAM และสิ่งที่ SLAM Toolbox ต้องการเป็นอินพุตได้</li>
+            <li>ตรวจสอบ TF Tree และ /scan ก่อนเริ่มสร้างแผนที่ได้</li>
+            <li>สร้างแผนที่ห้องด้วย <code>slam_toolbox</code> แล้วดูผลใน RViz2 ได้</li>
+            <li>บันทึกแผนที่เป็นไฟล์ <code>.pgm</code> + <code>.yaml</code> เพื่อใช้ต่อใน EP14 ได้</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>1. SLAM คืออะไร?</h3>
+        <p><strong>SLAM</strong> (Simultaneous Localization And Mapping) คือการ "วาดแผนที่ไปพร้อมกับรู้ว่าตัวเองอยู่ตรงไหนในแผนที่" เหมือนคนที่เดินเข้าห้องมืดแล้วคลำผนังวาดผังห้องไปเรื่อยๆ — ยิ่งเดินสำรวจ แผนที่ยิ่งสมบูรณ์ และ SLAM ยังช่วยแก้ความเพี้ยนสะสมของ Odometry (EP11) เมื่อหุ่นยนต์วนกลับมาจุดเดิม (<em>Loop Closure</em>)</p>
+<div class="code-block">/scan (EP12)  ─┐
+              ├─►  slam_toolbox  ─►  /map  (แผนที่)
+TF odom→base_link (EP11)  ─┘            └─►  TF map → odom</div>
+        <ul>
+            <li><strong>อินพุต:</strong> <code>/scan</code> จาก LiDAR และ TF จาก Odometry</li>
+            <li><strong>เอาต์พุต:</strong> แผนที่ <code>/map</code> ชนิด <code>nav_msgs/OccupancyGrid</code> และ TF <code>map → odom</code></li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>2. ก่อนเริ่ม: ตรวจสอบ TF และ LiDAR</h3>
+        <p>SLAM จะทำงานไม่ได้ถ้า TF ขาดช่วงหรือไม่มีข้อมูลสแกน ตรวจให้ครบทั้งสามข้อต่อ:</p>
+        <img class="diagram" src="../../assets/lessons/ep13-tf-tree.png" alt="TF Tree map ถึง odom ถึง base_link ถึง laser_frame และผู้ส่งแต่ละข้อต่อ">
+<div class="code-block">ros2 topic hz /scan
+ros2 run tf2_ros tf2_echo odom base_link
+ros2 run tf2_ros tf2_echo base_link laser_frame</div>
+<div class="highlight"><code>map → odom</code> ยังไม่ต้องมีตอนนี้ — <code>slam_toolbox</code> จะเป็นผู้ส่งเองเมื่อเริ่มทำงาน</div>
+<div class="alert-box"><strong>⚠️ Odometry ดีสำคัญมาก:</strong> ถ้าหุ่นยนต์หมุนแล้ว yaw ใน <code>/odom</code> คลาดเคลื่อน แผนที่จะบิดเบี้ยว ให้ทำ LAB 11.1–11.2 ใน EP11 ให้ผ่านก่อน</div>
+    </div>
+
+    <div class="section-box">
+        <h3>3. ติดตั้งและตั้งค่า</h3>
+<div class="code-block">sudo apt install -y ros-jazzy-slam-toolbox \
+  ros-jazzy-nav2-map-server ros-jazzy-teleop-twist-keyboard
+
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+ros2 pkg create --build-type ament_python brobot_slam
+mkdir -p brobot_slam/config</div>
+        <p>สร้างไฟล์ <code>~/ros2_ws/src/brobot_slam/config/mapper_params_online_async.yaml</code> (ย่อจากไฟล์ตัวอย่างของ <code>slam_toolbox</code> ค่าอื่นใช้ค่าเริ่มต้น):</p>
+<div class="code-block">slam_toolbox:
+  ros__parameters:
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+
+    # Frame และ Topic
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_link
+    scan_topic: /scan
+    mode: mapping
+
+    # คุณภาพแผนที่
+    resolution: 0.05
+    max_laser_range: 12.0
+    minimum_travel_distance: 0.2
+    minimum_travel_heading: 0.2
+    map_update_interval: 5.0
+    transform_publish_period: 0.02
+    transform_timeout: 0.2
+    tf_buffer_duration: 30.
+    do_loop_closing: true
+    stack_size_to_use: 40000000</div>
+<div class="highlight">ดูไฟล์ตัวอย่างฉบับเต็มได้ที่ <code>/opt/ros/jazzy/share/slam_toolbox/config/mapper_params_online_async.yaml</code></div>
+        <p>แก้ <code>setup.py</code> ให้ติดตั้งโฟลเดอร์ <code>config</code> (หลักการเดียวกับ EP6 และ EP11):</p>
+<div class="code-block">import os
+from glob import glob
+
+# ในลิสต์ data_files=[ ... ] ให้เพิ่มบรรทัดนี้
+(os.path.join(&#x27;share&#x27;, package_name, &#x27;config&#x27;), glob(&#x27;config/*.yaml&#x27;)),</div>
+<div class="code-block">cd ~/ros2_ws
+colcon build --symlink-install --packages-select brobot_slam
+source install/setup.bash</div>
+    </div>
+
+    <div class="section-box">
+        <h3>4. เริ่มสร้างแผนที่</h3>
+        <p>เปิดสาม Terminal (ทุกตัว Source ROS 2 และ Workspace ก่อน):</p>
+<div class="code-block"># Terminal 1 : SLAM Toolbox
+ros2 launch slam_toolbox online_async_launch.py \
+  slam_params_file:=$(ros2 pkg prefix brobot_slam)/share/brobot_slam/config/mapper_params_online_async.yaml \
+  use_sim_time:=false
+
+# Terminal 2 : ขับหุ่นยนต์ด้วยคีย์บอร์ด
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+# Terminal 3 : ดูแผนที่
+rviz2</div>
+        <ol>
+            <li>ใน RViz2 ตั้ง Fixed Frame เป็น <code>map</code></li>
+            <li>Add → Map เลือก Topic <code>/map</code> แล้วตั้ง Durability Policy เป็น <b>Transient Local</b></li>
+            <li>Add → LaserScan (Reliability: Best Effort) และ TF เพื่อดูตำแหน่งหุ่นยนต์</li>
+        </ol>
+<div class="alert-box"><strong>⚠️ ความปลอดภัย:</strong> ทดสอบทิศทางคำสั่งขับด้วยความเร็วต่ำก่อน และเตรียมสวิตช์ตัดไฟหรือปุ่มหยุดฉุกเฉินไว้ใกล้มือ <code>teleop_twist_keyboard</code> จะส่งคำสั่งต่อเนื่องจนกว่าจะกดปุ่มหยุด (<code>k</code>)</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> เมื่อหุ่นยนต์เคลื่อนที่ พื้นที่สีเทา (ยังไม่รู้) ค่อยๆ ถูกแทนที่ด้วยพื้นที่ว่างสีขาวและผนังสีดำ และมี TF <code>map → odom</code> เพิ่มขึ้นมา</div>
+    </div>
+
+    <div class="section-box">
+        <h3>5. แผนที่ที่ได้คืออะไร?</h3>
+        <p>แผนที่คือตาราง <strong>Occupancy Grid</strong> แต่ละช่องมีขนาดเท่ากับ <code>resolution</code> (0.05 เมตร) และมีค่าบอกสถานะ:</p>
+        <img class="diagram" src="../../assets/lessons/ep13-occupancy-grid.png" alt="แผนที่ Occupancy Grid ที่มีช่องว่าง ช่องสิ่งกีดขวาง และช่องที่ยังไม่รู้">
+<div class="table-wrap"><table>
+<thead><tr><th>ค่าในช่อง</th><th>ความหมาย</th></tr></thead>
+<tbody>
+<tr><td><code>0</code></td><td>ว่าง หุ่นยนต์เดินผ่านได้</td></tr>
+<tr><td><code>100</code></td><td>มีสิ่งกีดขวาง</td></tr>
+<tr><td><code>−1</code></td><td>ยังไม่เคยสำรวจ</td></tr>
+</tbody></table></div>
+    </div>
+
+    <div class="section-box">
+        <h3>6. เทคนิคสำรวจให้แผนที่สวย</h3>
+        <ul>
+            <li><strong>ขับช้าๆ</strong> โดยเฉพาะตอนเลี้ยว — หมุนเร็วทำให้สแกนเบลอและแผนที่บิด</li>
+            <li><strong>วนกลับจุดเดิม</strong> เพื่อให้เกิด Loop Closure ช่วยแก้ความเพี้ยนสะสม</li>
+            <li>หลีกเลี่ยงกระจก หน้าต่างกระจก และพื้นผิวมันวาว เพราะ LiDAR วัดไม่ได้หรือสะท้อนผิด</li>
+            <li>ทางเดินยาวที่ผนังเรียบเหมือนกันตลอด (Featureless) ทำให้ SLAM หลง ควรมีเฟอร์นิเจอร์หรือสิ่งของเป็นจุดสังเกต</li>
+            <li>ระวังคนเดินผ่าน เพราะจะกลายเป็นสิ่งกีดขวางปลอมในแผนที่</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>7. บันทึกแผนที่</h3>
+<div class="code-block">mkdir -p ~/maps
+ros2 run nav2_map_server map_saver_cli -f ~/maps/classroom</div>
+        <p>จะได้ 2 ไฟล์ที่ใช้ต่อใน EP14:</p>
+        <ul>
+            <li><code>classroom.pgm</code> — ภาพแผนที่ (ขาว = ว่าง, ดำ = สิ่งกีดขวาง, เทา = ยังไม่รู้)</li>
+            <li><code>classroom.yaml</code> — ข้อมูลกำกับแผนที่</li>
+        </ul>
+<div class="code-block">image: classroom.pgm
+mode: trinary
+resolution: 0.05
+origin: [-1.2, -3.4, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25</div>
+<div class="highlight"><strong>ทางเลือก:</strong> ถ้าต้องการกลับมาสำรวจแผนที่เดิมต่อภายหลัง ให้เก็บ Pose Graph ด้วย <code>ros2 service call /slam_toolbox/serialize_map slam_toolbox/srv/SerializePoseGraph "{filename: '/home/&lt;user&gt;/maps/classroom_graph'}"</code> (ใช้ Path เต็ม)</div>
+<div class="success-box"><strong>✅ ตรวจไฟล์:</strong> เปิด <code>classroom.pgm</code> ด้วยโปรแกรมดูรูปภาพ ต้องเห็นผังห้องที่ผนังเป็นเส้นต่อเนื่อง</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 13.1 — สร้างแผนที่ห้องเรียน</h3>
+<div class="lab-box">        <ol>
+            <li>ตรวจ TF และ /scan ตามหัวข้อ 2 ให้ครบ</li>
+            <li>เริ่ม <code>slam_toolbox</code> แล้วขับหุ่นยนต์ช้าๆ ให้ครบทุกมุมห้องและวนกลับจุดเริ่มต้น</li>
+            <li>บันทึกแผนที่ด้วย <code>map_saver_cli</code></li>
+            <li>วัดความกว้าง-ยาวห้องจริงด้วยตลับเมตร แล้วเทียบกับขนาดในแผนที่ (จำนวนช่อง × 0.05 เมตร)</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> ผนังเป็นเส้นตรงต่อเนื่อง ไม่ซ้อนกันเป็นสองชั้น และขนาดห้องในแผนที่คลาดเคลื่อนไม่เกิน 10%</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 13.2 — เปรียบเทียบการขับเร็วกับช้า</h3>
+<div class="lab-box">        <ol>
+            <li>สร้างแผนที่เดิมอีกครั้ง โดยหมุนเลี้ยวเร็วกว่าเดิมประมาณสองเท่า</li>
+            <li>บันทึกเป็นไฟล์ใหม่ เช่น <code>classroom_fast</code></li>
+            <li>เทียบรูปแผนที่สองไฟล์ แล้วสรุปว่าความเร็วมีผลอย่างไร</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> อธิบายความแตกต่างของสองแผนที่ได้พร้อมเหตุผล</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td>แผนที่ไม่ขึ้นใน RViz2</td><td>ตั้ง Fixed Frame เป็น map และ Map → Durability เป็น Transient Local</td></tr>
+<tr><td>Log ขึ้น Message Filter dropping message / ไม่มี transform</td><td>ตรวจ TF odom → base_link และ base_link → laser_frame ว่าไม่ขาด ไม่ซ้ำ (tf2_echo / view_frames)</td></tr>
+<tr><td>ผนังซ้อนเป็นสองชั้นหรือแผนที่บิด</td><td>Odometry ไม่แม่น ปรับ wheel_radius / track_width (EP11) และขับให้ช้าลง</td></tr>
+<tr><td>แผนที่ไม่อัปเดตเมื่อเคลื่อนที่</td><td>ค่า minimum_travel_distance / heading สูงเกินไป หรือ /scan ไม่มาตามเวลา (ตรวจ ros2 topic hz)</td></tr>
+<tr><td>หุ่นยนต์ในแผนที่ไม่ตรงกับความจริง</td><td>ตรวจทิศ LiDAR ใน static TF (EP9) ว่าหันตรงกับตัวหุ่นยนต์</td></tr>
+<tr><td>map_saver_cli ไม่ได้ไฟล์</td><td>ตรวจว่า slam_toolbox ยังทำงานอยู่ และมี Topic /map</td></tr>
+</tbody></table></div>
+    </div>
+</body>
+</html>

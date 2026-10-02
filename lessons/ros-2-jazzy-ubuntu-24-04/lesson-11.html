@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP11 - Odometry และ Sensor Fusion (EKF)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4 { color: #111827; }
+        .cover-img {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .alert-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th { background-color: #f3f4f6; }
+        .placeholder-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 14px;
+            border: 2px dashed #cbd5e1;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .flex-item {
+            flex: 1 1 300px;
+            background: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+            .success-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .lab-box {
+            background-color: #fffbeb;
+            border: 2px dashed #f59e0b;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .table-wrap { overflow-x: auto; }
+        .diagram {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .formula {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep11.jpg" alt="หน้าปก EP11 - Odometry และ Sensor Fusion (EKF)">
+
+    <h1 class="hero-title">EP11</h1>
+    <h2 style="text-align: center;">Odometry และ Sensor Fusion (EKF)</h2>
+    <p class="subtitle">"รู้ว่าหุ่นยนต์ไปไหนมา จากการหมุนของล้อและเซนเซอร์ IMU"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>อธิบายว่า Odometry คืออะไรและทำไมถึงเกิด Drift</li>
+            <li>คำนวณตำแหน่ง (x, y, θ) จากจำนวน Tick ของล้อซ้าย-ขวาได้</li>
+            <li>เขียน ROS 2 Node ที่ส่ง <code>nav_msgs/Odometry</code> และ TF <code>odom → base_link</code></li>
+            <li>ใช้ <code>robot_localization</code> (EKF) รวมข้อมูล Wheel Odometry กับ IMU ได้</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>1. Odometry คืออะไร?</h3>
+        <p><strong>Odometry</strong> คือการ "นับก้าว" ของหุ่นยนต์ — ใช้จำนวนรอบที่ล้อหมุน (จาก Encoder ใน EP7–EP8) คำนวณย้อนกลับว่าหุ่นยนต์ขยับไปไกลแค่ไหนและหันไปทางไหน เทียบได้กับการเดินนับก้าวโดยหลับตา เริ่มจากจุดที่รู้ตำแหน่งแน่นอน แล้วบวกระยะที่เดินเพิ่มไปเรื่อยๆ วิธีนี้เรียกว่า <em>Dead Reckoning</em></p>
+<div class="highlight">Odometry บอก <strong>"ตำแหน่งสัมพัทธ์ ณ จุดเริ่มต้น"</strong> ใน Frame <code>odom</code> เท่านั้น ไม่ใช่ตำแหน่งจริงในห้อง</div>
+        <img class="diagram" src="../../assets/lessons/ep11-odometry-drift.png" alt="ภาพเปรียบเทียบเส้นทางจริงกับเส้นทางจาก Odometry ที่ Drift">
+<div class="alert-box"><strong>⚠️ ข้อจำกัด:</strong> ความผิดพลาดเล็กน้อยทุกครั้งที่คำนวณจะ<strong>สะสม</strong>ไปเรื่อยๆ ล้อลื่นหรือวัดรัศมีล้อคลาดแค่ 1–2 มม. ก็ทำให้ตำแหน่งเพี้ยนได้มากเมื่อวิ่งไกล</div>
+    </div>
+
+    <div class="section-box">
+        <h3>2. สมการ Odometry สำหรับ Differential Drive</h3>
+        <p>ในแต่ละรอบการคำนวณ ให้หาระยะที่ล้อแต่ละข้างเคลื่อนที่ก่อน จากนั้นแปลงเป็นระยะเดินหน้าและมุมหมุนของตัวหุ่นยนต์:</p>
+        <div class="formula">
+            <p>$\Delta s_L = \Delta tick_L \times \dfrac{2\pi r}{N}$ , $\Delta s_R = \Delta tick_R \times \dfrac{2\pi r}{N}$</p>
+            <p>$\Delta s = \dfrac{\Delta s_R + \Delta s_L}{2}$ , $\Delta\theta = \dfrac{\Delta s_R - \Delta s_L}{L}$</p>
+            <p>$x \leftarrow x + \Delta s \cos(\theta + \tfrac{\Delta\theta}{2})$</p>
+            <p>$y \leftarrow y + \Delta s \sin(\theta + \tfrac{\Delta\theta}{2})$</p>
+            <p>$\theta \leftarrow \theta + \Delta\theta$</p>
+        </div>
+        <ul>
+            <li>$r$ = รัศมีล้อ (เมตร), $N$ = จำนวน Tick ต่อรอบล้อ, $L$ = ระยะห่างล้อซ้าย-ขวา (Track Width จาก EP10)</li>
+            <li>ใช้ $\theta + \Delta\theta/2$ (มุมกึ่งกลาง) เพื่อให้แม่นกว่าใช้มุมเดิมอย่างเดียว</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>3. ROS 2 สื่อสาร Odometry อย่างไร?</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>สิ่งที่ส่ง</th><th>ชนิด</th><th>รายละเอียด</th></tr></thead>
+<tbody>
+<tr><td><code>/odom</code></td><td><code>nav_msgs/msg/Odometry</code></td><td>pose (x, y, yaw) และ twist (ความเร็ว) พร้อม Covariance</td></tr>
+<tr><td><code>TF</code></td><td><code>odom → base_link</code></td><td>บอกว่า base_link อยู่ตรงไหนเมื่อเทียบกับ odom (จาก EP9)</td></tr>
+</tbody></table></div>
+<div class="highlight">Frame <code>odom</code> จะ<strong>ต่อเนื่องเสมอ</strong> (ไม่กระโดด) แต่เพี้ยนสะสมได้ ส่วน Frame <code>map</code> (EP13) จะแก้ความเพี้ยนนั้นให้ภายหลัง</div>
+    </div>
+
+    <div class="section-box">
+        <h3>4. เขียน Wheel Odometry Node</h3>
+<div class="code-block">mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+ros2 pkg create --build-type ament_python brobot_odom \
+  --dependencies rclpy nav_msgs geometry_msgs std_msgs tf2_ros</div>
+        <p>สร้างไฟล์ <code>~/ros2_ws/src/brobot_odom/brobot_odom/wheel_odometry.py</code> — Node นี้รับค่า Tick จาก Topic <code>/wheel_encoder_ticks</code> ของ EP7 (ข้อมูลเป็น <code>[left, right]</code>)</p>
+<div class="code-block">import math
+
+import rclpy
+from rclpy.node import Node
+from geometry_msgs.msg import TransformStamped
+from nav_msgs.msg import Odometry
+from std_msgs.msg import Int32MultiArray
+from tf2_ros import TransformBroadcaster
+
+
+class WheelOdometry(Node):
+    def __init__(self):
+        super().__init__(&#x27;wheel_odometry&#x27;)
+        self.declare_parameter(&#x27;wheel_radius&#x27;, 0.033)    # เมตร
+        self.declare_parameter(&#x27;track_width&#x27;, 0.16)      # เมตร ระยะห่างล้อซ้าย-ขวา
+        self.declare_parameter(&#x27;ticks_per_rev&#x27;, 600.0)   # ต้องตรงกับ Encoder จริง
+        self.declare_parameter(&#x27;publish_tf&#x27;, True)
+
+        self.radius = self.get_parameter(&#x27;wheel_radius&#x27;).value
+        self.track = self.get_parameter(&#x27;track_width&#x27;).value
+        self.ticks_per_rev = self.get_parameter(&#x27;ticks_per_rev&#x27;).value
+        self.publish_tf = self.get_parameter(&#x27;publish_tf&#x27;).value
+
+        self.x = 0.0
+        self.y = 0.0
+        self.theta = 0.0
+        self.prev_ticks = None
+        self.prev_time = None
+
+        self.odom_pub = self.create_publisher(Odometry, &#x27;odom&#x27;, 10)
+        self.tf_broadcaster = TransformBroadcaster(self)
+        self.create_subscription(
+            Int32MultiArray, &#x27;wheel_encoder_ticks&#x27;, self.on_ticks, 10)
+        self.get_logger().info(&#x27;Wheel odometry started&#x27;)
+
+    @staticmethod
+    def wrap_delta(delta):
+        # รองรับกรณีค่า tick เป็น int16 ที่วนกลับ (-32768..32767)
+        return (delta + 32768) % 65536 - 32768
+
+    def on_ticks(self, msg):
+        if len(msg.data) &lt; 2:
+            return
+        left, right = msg.data[0], msg.data[1]
+        now = self.get_clock().now()
+        if self.prev_ticks is None:
+            self.prev_ticks = (left, right)
+            self.prev_time = now
+            return
+
+        delta_left = self.wrap_delta(left - self.prev_ticks[0])
+        delta_right = self.wrap_delta(right - self.prev_ticks[1])
+        dt = (now - self.prev_time).nanoseconds * 1e-9
+        self.prev_ticks = (left, right)
+        self.prev_time = now
+        if dt &lt;= 0.0:
+            return
+
+        meters_per_tick = 2.0 * math.pi * self.radius / self.ticks_per_rev
+        dist_left = delta_left * meters_per_tick
+        dist_right = delta_right * meters_per_tick
+        dist = (dist_left + dist_right) / 2.0
+        d_theta = (dist_right - dist_left) / self.track
+
+        self.x += dist * math.cos(self.theta + d_theta / 2.0)
+        self.y += dist * math.sin(self.theta + d_theta / 2.0)
+        self.theta += d_theta
+        self.publish(now, dist / dt, d_theta / dt)
+
+    def publish(self, now, linear, angular):
+        qz = math.sin(self.theta / 2.0)
+        qw = math.cos(self.theta / 2.0)
+        stamp = now.to_msg()
+
+        odom = Odometry()
+        odom.header.stamp = stamp
+        odom.header.frame_id = &#x27;odom&#x27;
+        odom.child_frame_id = &#x27;base_link&#x27;
+        odom.pose.pose.position.x = self.x
+        odom.pose.pose.position.y = self.y
+        odom.pose.pose.orientation.z = qz
+        odom.pose.pose.orientation.w = qw
+        odom.twist.twist.linear.x = linear
+        odom.twist.twist.angular.z = angular
+        # ค่า Covariance ไม่ควรเป็นศูนย์ทั้งหมด เพราะ EKF ใช้ถ่วงน้ำหนักข้อมูล
+        odom.pose.covariance[0] = 0.01
+        odom.pose.covariance[7] = 0.01
+        odom.pose.covariance[35] = 0.03
+        odom.twist.covariance[0] = 0.01
+        odom.twist.covariance[35] = 0.03
+        self.odom_pub.publish(odom)
+
+        if self.publish_tf:
+            tf = TransformStamped()
+            tf.header.stamp = stamp
+            tf.header.frame_id = &#x27;odom&#x27;
+            tf.child_frame_id = &#x27;base_link&#x27;
+            tf.transform.translation.x = self.x
+            tf.transform.translation.y = self.y
+            tf.transform.rotation.z = qz
+            tf.transform.rotation.w = qw
+            self.tf_broadcaster.sendTransform(tf)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = WheelOdometry()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == &#x27;__main__&#x27;:
+    main()</div>
+<div class="highlight"><strong>สมมติฐานของโค้ด:</strong> ค่าใน <code>/wheel_encoder_ticks</code> เป็นจำนวน Tick <em>สะสม</em> ของแต่ละล้อ (ไม่ใช่ความเร็ว) และตั้งค่า <code>wheel_radius</code>, <code>track_width</code>, <code>ticks_per_rev</code> ให้ตรงกับหุ่นยนต์จริงผ่าน <code>--ros-args -p</code></div>
+    </div>
+
+    <div class="section-box">
+        <h3>5. ลงทะเบียนและ Build</h3>
+        <p>แก้ <code>setup.py</code>:</p>
+<div class="code-block">entry_points={
+    &#x27;console_scripts&#x27;: [
+        &#x27;wheel_odometry = brobot_odom.wheel_odometry:main&#x27;,
+    ],
+},</div>
+<div class="code-block">cd ~/ros2_ws
+colcon build --symlink-install --packages-select brobot_odom
+source install/setup.bash
+ros2 run brobot_odom wheel_odometry --ros-args \
+  -p wheel_radius:=0.033 -p track_width:=0.16 -p ticks_per_rev:=600.0</div>
+    </div>
+
+    <div class="section-box">
+        <h3>6. ตรวจผล</h3>
+<div class="code-block"># Terminal ใหม่
+source /opt/ros/jazzy/setup.bash
+source ~/ros2_ws/install/setup.bash
+
+ros2 topic echo /odom --once
+ros2 topic hz /odom
+ros2 run tf2_ros tf2_echo odom base_link</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> เมื่อหมุนล้อไปข้างหน้าด้วยมือ ค่า <code>position.x</code> เพิ่มขึ้น หมุนล้อขวาอย่างเดียวแล้ว <code>orientation.z</code> เปลี่ยนไปทางซ้าย และ <code>tf2_echo</code> แสดงค่าตรงกับ <code>/odom</code></div>
+    </div>
+
+    <div class="section-box">
+        <h3>7. รวมข้อมูลด้วย EKF (robot_localization)</h3>
+        <p>Wheel Odometry แม่นระยะสั้นแต่ล้อลื่นได้ ส่วน <strong>IMU</strong> (เซนเซอร์วัดการหมุน) ไวต่อการเปลี่ยนทิศแต่ค่า Drift ตามเวลา <strong>EKF (Extended Kalman Filter)</strong> จะรวมสองแหล่งเข้าด้วยกัน โดยถ่วงน้ำหนักตามความน่าเชื่อถือ (Covariance) ของแต่ละค่า</p>
+        <img class="diagram" src="../../assets/lessons/ep11-sensor-fusion.png" alt="แผนภาพ EKF รวม Wheel Odometry กับ IMU ออกเป็น odometry/filtered และ TF">
+<div class="code-block">sudo apt install -y ros-jazzy-robot-localization</div>
+        <p>สร้างไฟล์ <code>~/ros2_ws/src/brobot_odom/config/ekf.yaml</code>:</p>
+<div class="code-block">ekf_filter_node:
+  ros__parameters:
+    frequency: 30.0
+    two_d_mode: true
+    publish_tf: true
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_link
+    world_frame: odom
+
+    # ลำดับ 15 ค่า: x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az
+    odom0: /odom
+    odom0_config: [false, false, false,
+                   false, false, false,
+                   true,  false, false,
+                   false, false, true,
+                   false, false, false]
+    odom0_differential: false
+
+    imu0: /imu/data
+    imu0_config: [false, false, false,
+                  false, false, true,
+                  false, false, false,
+                  false, false, true,
+                  false, false, false]
+    imu0_differential: false</div>
+<div class="highlight"><strong>อ่าน <code>_config</code> อย่างไร?</strong> เป็นรายการ true/false 15 ค่า เรียงตาม x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az ตัวอย่างนี้ใช้ <em>ความเร็วเดินหน้า (vx) และความเร็วหมุน (vyaw) จากล้อ</em> กับ <em>yaw และ vyaw จาก IMU</em> ถ้ายังไม่มี IMU ให้ลบกลุ่ม <code>imu0</code> ออก</div>
+    </div>
+
+    <div class="section-box">
+        <h3>8. Launch และตรวจผลการรวมข้อมูล</h3>
+        <p>สร้างไฟล์ <code>~/ros2_ws/src/brobot_odom/launch/ekf.launch.py</code>:</p>
+<div class="code-block">import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+
+def generate_launch_description():
+    config = os.path.join(
+        get_package_share_directory(&#x27;brobot_odom&#x27;), &#x27;config&#x27;, &#x27;ekf.yaml&#x27;)
+    return LaunchDescription([
+        Node(
+            package=&#x27;brobot_odom&#x27;,
+            executable=&#x27;wheel_odometry&#x27;,
+            name=&#x27;wheel_odometry&#x27;,
+            parameters=[{&#x27;publish_tf&#x27;: False}],  # ให้ EKF เป็นผู้ส่ง TF แทน
+        ),
+        Node(
+            package=&#x27;robot_localization&#x27;,
+            executable=&#x27;ekf_node&#x27;,
+            name=&#x27;ekf_filter_node&#x27;,
+            output=&#x27;screen&#x27;,
+            parameters=[config],
+        ),
+    ])</div>
+        <p>แก้ <code>setup.py</code> ให้ติดตั้งโฟลเดอร์ <code>launch</code> และ <code>config</code> (หลักการเดียวกับ EP6):</p>
+<div class="code-block">import os
+from glob import glob
+
+# ในลิสต์ data_files=[ ... ] ให้เพิ่ม 2 บรรทัดนี้
+(os.path.join(&#x27;share&#x27;, package_name, &#x27;launch&#x27;), glob(&#x27;launch/*.launch.py&#x27;)),
+(os.path.join(&#x27;share&#x27;, package_name, &#x27;config&#x27;), glob(&#x27;config/*.yaml&#x27;)),</div>
+<div class="code-block">cd ~/ros2_ws
+colcon build --symlink-install --packages-select brobot_odom
+source install/setup.bash
+ros2 launch brobot_odom ekf.launch.py</div>
+<div class="code-block"># Terminal ใหม่
+ros2 topic echo /odometry/filtered --once
+ros2 run tf2_ros tf2_echo odom base_link</div>
+<div class="alert-box"><strong>⚠️ ผู้ส่ง TF ต้องมีคนเดียว:</strong> เมื่อใช้ EKF ต้องตั้ง <code>publish_tf: False</code> ให้ Wheel Odometry Node (ดังในไฟล์ Launch ด้านบน) ไม่เช่นนั้นจะมีสอง Node แย่งส่ง <code>odom → base_link</code> แล้วหุ่นยนต์ใน RViz2 จะกระตุก</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> ได้ Topic <code>/odometry/filtered</code> และ TF <code>odom → base_link</code> ต่อเนื่อง และเมื่อหมุนหุ่นยนต์ในที่ ค่า yaw ไม่เพี้ยนตามล้อลื่น</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 11.1 — วิ่งตรง 2 เมตร</h3>
+<div class="lab-box">        <ol>
+            <li>ยกล้อพ้นพื้นก่อนทดสอบครั้งแรก แล้วค่อยวางหุ่นยนต์บนพื้น</li>
+            <li>ทำเครื่องหมายจุดเริ่มต้น ขับหุ่นยนต์ตรงไป 2.0 เมตร (วัดด้วยตลับเมตร)</li>
+            <li>อ่าน <code>position.x</code> จาก <code>/odom</code> แล้วคำนวณ error (%)</li>
+            <li>ถ้า error เกิน 5% ให้ปรับ <code>wheel_radius</code> แล้วทดสอบใหม่</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> ระยะจาก Odometry ต่างจากระยะจริงไม่เกิน 5%</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 11.2 — หมุนครบรอบ</h3>
+<div class="lab-box">        <ol>
+            <li>หมุนหุ่นยนต์รอบตัวเองครบ 1 รอบ (360°) ด้วยมือหรือด้วยคำสั่งความเร็วต่ำ</li>
+            <li>ดูค่า yaw ใน RViz2 (Add → Odometry หรือ TF)</li>
+            <li>ปรับ <code>track_width</code> จนหมุนครบรอบแล้วหันกลับมาทิศเดิม</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> หมุนครบรอบแล้ว yaw คลาดเคลื่อนไม่เกิน 10°</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td>วิ่งไปข้างหน้าแต่ x ลดลง</td><td>ทิศ Encoder กลับ ให้สลับเครื่องหมาย Tick หรือสลับสาย A/B</td></tr>
+<tr><td>วิ่งตรงแต่เส้นทางโค้ง</td><td>ล้อซ้าย-ขวามี ticks_per_rev หรือรัศมีไม่เท่ากัน ให้ตรวจและวัดใหม่</td></tr>
+<tr><td>หมุนในที่แล้ว yaw ไม่ครบ</td><td>ปรับ track_width ให้ตรงกับระยะล้อจริง</td></tr>
+<tr><td>ตำแหน่งกระโดดหรือกระตุก</td><td>มีสอง Node ส่ง TF odom → base_link ให้ปิดตัวหนึ่ง</td></tr>
+<tr><td>EKF ไม่ส่งข้อมูล</td><td>ตรวจชื่อ Topic ใน ekf.yaml, stamp ของข้อความ และ Covariance ไม่เป็นศูนย์ทั้งหมด</td></tr>
+<tr><td>ค่า Tick เพี้ยนตอนกลับด้าน</td><td>ค่า int16 วนรอบที่ ±32768 โค้ดใช้ wrap_delta จัดการแล้ว ตรวจว่าไม่ได้ลบทิ้ง</td></tr>
+</tbody></table></div>
+    </div>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {delimiters: [{left: '$', right: '$', display: false}], ignoredClasses: ['code-block']});"></script>
+</body>
+</html>

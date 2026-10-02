@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP14 - Nav2 — Localization และ Navigation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4 { color: #111827; }
+        .cover-img {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .alert-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th { background-color: #f3f4f6; }
+        .placeholder-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 14px;
+            border: 2px dashed #cbd5e1;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .flex-item {
+            flex: 1 1 300px;
+            background: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+            .success-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .lab-box {
+            background-color: #fffbeb;
+            border: 2px dashed #f59e0b;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .table-wrap { overflow-x: auto; }
+        .diagram {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .formula {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep14.jpg" alt="หน้าปก EP14 - Nav2 — Localization และ Navigation">
+
+    <h1 class="hero-title">EP14</h1>
+    <h2 style="text-align: center;">Nav2 — Localization และ Navigation</h2>
+    <p class="subtitle">"ให้หุ่นยนต์รู้ตำแหน่งบนแผนที่ และเดินไปยังเป้าหมายเองอย่างปลอดภัย"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>อธิบายหน้าที่ของส่วนประกอบหลักใน Nav2 (AMCL, Planner, Controller, Costmap) ได้</li>
+            <li>ตรวจว่าหุ่นยนต์มีสิ่งจำเป็นครบก่อนเริ่มใช้ Nav2 ได้</li>
+            <li>ตั้งค่าและเปิดใช้ Nav2 กับแผนที่จาก EP13 ได้</li>
+            <li>ส่งเป้าหมายผ่าน RViz2 และ Command Line แล้วตรวจผลได้อย่างปลอดภัย</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>1. Nav2 คืออะไร?</h3>
+        <p><strong>Nav2</strong> (Navigation 2) คือชุดโปรแกรมที่ทำให้หุ่นยนต์ "เดินไปยังจุดหมายเอง" เมื่อมีแผนที่แล้ว เหมือนการใช้แอปนำทางในรถ — มันรู้ว่าเราอยู่ตรงไหนบนแผนที่ วางเส้นทางไปจุดหมาย แล้วควบคุมล้อให้เดินตามเส้นทาง พร้อมหลบสิ่งกีดขวางที่เจอระหว่างทาง</p>
+        <img class="diagram" src="../../assets/lessons/ep14-nav2-architecture.png" alt="สถาปัตยกรรม Nav2 จาก Goal ผ่าน BT Navigator Planner Controller ไปยังมอเตอร์ พร้อม Map Server AMCL และ Costmap">
+<div class="table-wrap"><table>
+<thead><tr><th>ส่วนประกอบ</th><th>หน้าที่</th></tr></thead>
+<tbody>
+<tr><td><code>Map Server</code></td><td>โหลดแผนที่ (.yaml + .pgm จาก EP13) แล้วส่งเป็น /map</td></tr>
+<tr><td><code>AMCL</code></td><td>หาตำแหน่งหุ่นยนต์บนแผนที่ โดยเทียบ /scan กับแผนที่ และส่ง TF map → odom</td></tr>
+<tr><td><code>Costmap 2D</code></td><td>แผนที่ที่ใส่ &quot;ค่าความเสี่ยง&quot; รอบสิ่งกีดขวาง มีแบบ Global (ทั้งแผนที่) และ Local (รอบตัว)</td></tr>
+<tr><td><code>Planner Server</code></td><td>วางเส้นทางทั้งเส้นจากตำแหน่งปัจจุบันไปเป้าหมาย (Global Path)</td></tr>
+<tr><td><code>Controller Server</code></td><td>สั่งความเร็ว cmd_vel ให้เดินตามเส้นทาง พร้อมหลบสิ่งกีดขวางใกล้ตัว (Local Path)</td></tr>
+<tr><td><code>BT Navigator</code></td><td>ประสานงานทั้งหมดด้วย Behavior Tree และรับเป้าหมายแบบ NavigateToPose</td></tr>
+<tr><td><code>Behavior Server</code></td><td>ท่ากู้สถานการณ์ เช่น ถอยหลัง หมุนรอบตัว เมื่อติดขัด</td></tr>
+</tbody></table></div>
+        <img class="diagram" src="../../assets/lessons/ep14-global-local-path.png" alt="Global Path วางแผนทั้งเส้นทาง ส่วน Local Path หลบสิ่งกีดขวางใกล้ตัว">
+    </div>
+
+    <div class="section-box">
+        <h3>2. ก่อนเริ่ม: ตรวจว่ามีครบทุกอย่าง</h3>
+        <p>Nav2 ต่อยอดจากทุกตอนก่อนหน้า ตรวจให้ครบก่อนเปิดใช้งาน:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>สิ่งที่ต้องมี</th><th>มาจากตอน</th><th>ตรวจด้วย</th></tr></thead>
+<tbody>
+<tr><td>แผนที่ .yaml + .pgm</td><td>EP13</td><td><code>ls ~/maps/</code></td></tr>
+<tr><td>/scan จาก LiDAR</td><td>EP12</td><td><code>ros2 topic hz /scan</code></td></tr>
+<tr><td>TF odom → base_link</td><td>EP11</td><td><code>ros2 run tf2_ros tf2_echo odom base_link</code></td></tr>
+<tr><td>TF base_link → laser_frame</td><td>EP9</td><td><code>ros2 run tf2_ros tf2_echo base_link laser_frame</code></td></tr>
+<tr><td>Node ที่รับ /cmd_vel แล้วหมุนล้อ</td><td>EP8, EP10</td><td><code>ros2 topic info /cmd_vel</code></td></tr>
+</tbody></table></div>
+<div class="alert-box"><strong>⚠️ ความปลอดภัย:</strong> Nav2 ส่ง <code>/cmd_vel</code> เองเมื่อมีเป้าหมาย หุ่นยนต์จะเคลื่อนที่ทันที ก่อนทดสอบครั้งแรกให้ยกล้อพ้นพื้น จำกัดความเร็วต่ำ และเตรียมสวิตช์ตัดไฟ รวมทั้งต้องมี Watchdog ฝั่ง STM32 (EP8) ที่หยุดมอเตอร์เมื่อไม่ได้รับคำสั่ง</div>
+    </div>
+
+    <div class="section-box">
+        <h3>3. ติดตั้งและเตรียมไฟล์ตั้งค่า</h3>
+<div class="code-block">sudo apt install -y ros-jazzy-navigation2 ros-jazzy-nav2-bringup
+
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+ros2 pkg create --build-type ament_python brobot_nav
+mkdir -p brobot_nav/config
+cp /opt/ros/jazzy/share/nav2_bringup/params/nav2_params.yaml \
+   brobot_nav/config/nav2_params.yaml</div>
+        <p>ไฟล์ <code>nav2_params.yaml</code> ยาวมาก ไม่ต้องเขียนใหม่ทั้งหมด ให้ค้นและแก้เฉพาะจุดสำคัญเหล่านี้:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>สิ่งที่ต้องแก้</th><th>ทำไม</th></tr></thead>
+<tbody>
+<tr><td>base_footprint → base_link (ค้นด้วย grep -n base_footprint)</td><td>โปรเจกต์นี้ใช้ Frame base_link ตั้งแต่ EP9 ค่าเริ่มต้นของ Nav2 บางจุดใช้ base_footprint</td></tr>
+<tr><td>scan_topic ของ amcl และ topic ของ obstacle_layer / voxel_layer เป็น scan</td><td>ให้ตรงกับ Topic /scan ของ LiDAR</td></tr>
+<tr><td>robot_radius ของ local_costmap และ global_costmap</td><td>ตั้งให้ใกล้รัศมีจริงของหุ่นยนต์ (เมตร) ไม่เช่นนั้นหุ่นยนต์จะผ่านทางแคบไม่ได้หรือเฉี่ยวชน</td></tr>
+<tr><td>ความเร็วสูงสุดของ controller_server (เช่น max_vel_x, max_vel_theta)</td><td>เริ่มต้นต่ำ เช่น 0.15 m/s และ 0.5 rad/s เพื่อความปลอดภัย</td></tr>
+<tr><td>use_sim_time ให้เป็น False</td><td>หุ่นยนต์จริงใช้เวลาจริง</td></tr>
+</tbody></table></div>
+<div class="highlight">ชื่อพารามิเตอร์อาจต่างกันเล็กน้อยตามเวอร์ชันและ Controller ที่เลือกใช้ ให้ค้นดูในไฟล์ที่คัดลอกมา (ค่าเริ่มต้นของ Jazzy ใช้ DWB เป็น Controller)</div>
+        <p>แก้ <code>setup.py</code> ให้ติดตั้งโฟลเดอร์ <code>config</code> แล้ว Build:</p>
+<div class="code-block">import os
+from glob import glob
+
+# ในลิสต์ data_files=[ ... ] ให้เพิ่มบรรทัดนี้
+(os.path.join(&#x27;share&#x27;, package_name, &#x27;config&#x27;), glob(&#x27;config/*.yaml&#x27;)),</div>
+<div class="code-block">cd ~/ros2_ws
+colcon build --symlink-install --packages-select brobot_nav
+source install/setup.bash</div>
+    </div>
+
+    <div class="section-box">
+        <h3>4. เปิด Nav2</h3>
+<div class="code-block"># Terminal 1 : Nav2 (ต้องรันส่วน LiDAR, Odometry และมอเตอร์ไว้แล้ว)
+ros2 launch nav2_bringup bringup_launch.py \
+  map:=$HOME/maps/classroom.yaml \
+  params_file:=$(ros2 pkg prefix brobot_nav)/share/brobot_nav/config/nav2_params.yaml \
+  use_sim_time:=false
+
+# Terminal 2 : RViz2 พร้อมการตั้งค่าสำหรับ Nav2
+ros2 launch nav2_bringup rviz_launch.py</div>
+        <p>ตรวจว่า Node หลักพร้อมทำงาน (สถานะ <code>active</code>):</p>
+<div class="code-block">ros2 lifecycle get /map_server
+ros2 lifecycle get /amcl
+ros2 lifecycle get /controller_server
+ros2 lifecycle get /planner_server</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> ทุกคำสั่งตอบ <code>active [3]</code> และ RViz2 แสดงแผนที่จาก EP13</div>
+    </div>
+
+    <div class="section-box">
+        <h3>5. บอกตำแหน่งเริ่มต้น และส่งเป้าหมาย</h3>
+        <ol>
+            <li>ใน RViz2 กดปุ่ม <b>2D Pose Estimate</b> แล้วคลิกบนแผนที่ตรงตำแหน่งที่หุ่นยนต์ยืนอยู่จริง พร้อมลากเมาส์ให้ลูกศรชี้ทิศที่หุ่นยนต์หัน</li>
+            <li>ดูจุดสีเขียวของ AMCL (Particle Cloud) ควรรวมตัวเป็นกลุ่มเล็กรอบหุ่นยนต์ เมื่อขยับหุ่นยนต์เล็กน้อย</li>
+            <li>กดปุ่ม <b>Nav2 Goal</b> แล้วคลิกจุดหมายบนแผนที่ พร้อมลากเพื่อกำหนดทิศปลายทาง</li>
+            <li>สังเกตเส้นทางสีเขียว (Global Path) และหุ่นยนต์เริ่มเคลื่อนที่ไปยังเป้าหมาย</li>
+        </ol>
+        <h4>ส่งเป้าหมายจาก Command Line</h4>
+<div class="code-block">ros2 action send_goal /navigate_to_pose nav2_msgs/action/NavigateToPose \
+  &quot;{pose: {header: {frame_id: map}, pose: {position: {x: 1.0, y: 0.5, z: 0.0}, orientation: {w: 1.0}}}}&quot; \
+  --feedback</div>
+        <h4>ตั้งตำแหน่งเริ่มต้นจาก Command Line (ทางเลือก)</h4>
+<div class="code-block">ros2 topic pub --once /initialpose geometry_msgs/msg/PoseWithCovarianceStamped \
+  &quot;{header: {frame_id: map}, pose: {pose: {position: {x: 0.0, y: 0.0, z: 0.0}, orientation: {w: 1.0}}}}&quot;</div>
+<div class="alert-box"><strong>⚠️ พิกัดเป้าหมายอยู่ใน Frame <code>map</code> (หน่วยเมตร)</strong> ตรวจให้แน่ใจว่าเป้าหมายอยู่ในพื้นที่ว่างของแผนที่ และมีระยะห่างจากสิ่งกีดขวางมากกว่ารัศมีหุ่นยนต์ ไม่เช่นนั้นจะวางแผนไม่ได้</div>
+    </div>
+
+    <div class="section-box">
+        <h3>6. ตรวจสอบระบบขณะนำทาง</h3>
+<div class="code-block">ros2 topic echo /cmd_vel              # ความเร็วที่ส่งให้หุ่นยนต์ (ดูแล้วกด Ctrl+C)
+ros2 topic info /cmd_vel -v           # ตรวจว่า Node มอเตอร์เป็น Subscriber อยู่
+ros2 run tf2_ros tf2_echo map base_link   # ตำแหน่งหุ่นยนต์บนแผนที่</div>
+<div class="highlight">ในบางเวอร์ชัน Nav2 ส่งคำสั่งผ่านหลายขั้น (Controller → Velocity Smoother → Collision Monitor) ก่อนออกที่ <code>/cmd_vel</code> ให้ตรวจชื่อ Topic ปลายทางจริงด้วย <code>ros2 topic list</code> และตั้ง Node มอเตอร์ให้ Subscribe ตรงกัน</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 14.1 — เดินไปหลายจุด</h3>
+<div class="lab-box">        <ol>
+            <li>ตั้ง Initial Pose ให้ตรงกับตำแหน่งจริง และยืนยันว่า Particle Cloud รวมตัวกัน</li>
+            <li>ส่งเป้าหมาย 3 จุดในห้องทีละจุด รอให้ถึงก่อนส่งจุดต่อไป</li>
+            <li>บันทึกเวลาและสังเกตว่าหุ่นยนต์หยุดห่างจากจุดหมายกี่เซนติเมตร</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> หุ่นยนต์ถึงทั้ง 3 จุดโดยไม่ชน และหยุดห่างจากจุดหมายไม่เกิน 20 ซม.</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 14.2 — หลบสิ่งกีดขวางใหม่</h3>
+<div class="lab-box">        <ol>
+            <li>ส่งเป้าหมายที่อยู่ห่างออกไปตรงๆ</li>
+            <li>ขณะหุ่นยนต์กำลังเดิน วางกล่องไว้ขวางทาง (ห่างจากหุ่นยนต์เกิน 1 เมตร)</li>
+            <li>สังเกตว่า Local Costmap เปลี่ยนอย่างไร และหุ่นยนต์เลือกเส้นทางใหม่หรือหยุดรอ</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> หุ่นยนต์หลบกล่องไปถึงเป้าหมาย หรือหยุดอย่างปลอดภัยโดยไม่ชน</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td>ส่งเป้าหมายแล้วหุ่นยนต์ไม่ขยับ</td><td>ตรวจ lifecycle ว่า active ตรวจ ros2 topic info /cmd_vel ว่ามี Node มอเตอร์ Subscribe และ Watchdog ไม่ตัดคำสั่ง</td></tr>
+<tr><td>Particle Cloud กระจายหรือกระโดด</td><td>ตั้ง 2D Pose Estimate ใหม่ให้ตรง ตรวจ Odometry (EP11) และทิศ LiDAR (EP9)</td></tr>
+<tr><td>Log ขึ้น Could not transform / base_footprint</td><td>ยังมี base_footprint ในไฟล์ตั้งค่า ให้เปลี่ยนเป็น base_link ทุกจุด</td></tr>
+<tr><td>Costmap ไม่แสดงสิ่งกีดขวาง</td><td>ตรวจ topic scan และ frame ใน obstacle_layer และ TF ของ laser_frame</td></tr>
+<tr><td>หุ่นยนต์ผ่านทางแคบไม่ได้</td><td>ลด robot_radius หรือ inflation_radius ให้สมเหตุสมผลกับขนาดจริง</td></tr>
+<tr><td>หุ่นยนต์สั่นหรือเฉี่ยวชนมุม</td><td>ลดความเร็วสูงสุด ตรวจ robot_radius และ PID ของมอเตอร์ (EP8)</td></tr>
+<tr><td>Failed to make progress / ติดขัด</td><td>ตรวจว่าเป้าหมายอยู่ในพื้นที่ว่าง และ Behavior Server ทำงาน (ถอยหลัง/หมุน)</td></tr>
+</tbody></table></div>
+    </div>
+</body>
+</html>

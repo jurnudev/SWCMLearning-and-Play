@@ -1,0 +1,14 @@
+{
+  "name": "swcm-build-protected",
+  "private": true,
+  "type": "module",
+  "description": "Builds a minified/obfuscated copy of the site into ../dist",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "html-minifier-terser": "^7.2.0",
+    "javascript-obfuscator": "^5.8.1"
+  }
+}

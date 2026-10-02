@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP12 - LiDAR และ LaserScan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4 { color: #111827; }
+        .cover-img {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .alert-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th { background-color: #f3f4f6; }
+        .placeholder-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 14px;
+            border: 2px dashed #cbd5e1;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .flex-item {
+            flex: 1 1 300px;
+            background: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+            .success-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .lab-box {
+            background-color: #fffbeb;
+            border: 2px dashed #f59e0b;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .table-wrap { overflow-x: auto; }
+        .diagram {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .formula {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep12.jpg" alt="หน้าปก EP12 - LiDAR และ LaserScan">
+
+    <h1 class="hero-title">EP12</h1>
+    <h2 style="text-align: center;">LiDAR และ LaserScan</h2>
+    <p class="subtitle">"ทำความเข้าใจข้อมูลที่ LiDAR ส่งมา และนำไปใช้ตรวจจับสิ่งกีดขวาง"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>อธิบายหลักการทำงานของ LiDAR 2D และข้อมูล <code>sensor_msgs/LaserScan</code> ได้</li>
+            <li>อ่านค่า <code>angle_min</code>, <code>angle_increment</code> และ <code>ranges[]</code> แปลงเป็นมุมและระยะได้</li>
+            <li>จัดการค่า <code>inf</code> / <code>nan</code> ก่อนนำข้อมูลไปใช้ได้</li>
+            <li>ตรวจสอบ /scan ด้วย <code>ros2 topic</code> และ RViz2 และเขียน Node ตรวจจับสิ่งกีดขวางได้</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>1. LiDAR คืออะไร?</h3>
+        <p><strong>LiDAR 2D</strong> คือเซนเซอร์ที่หมุนยิงแสงเลเซอร์ไปรอบตัวและวัดเวลาที่แสงสะท้อนกลับ เพื่อคำนวณ "ระยะ" ถึงสิ่งกีดขวางในแต่ละทิศ หมุนครบรอบหนึ่งครั้งจะได้ระยะรอบตัวเป็นร้อยจุด เรียกว่า <em>1 Scan</em> และส่งออกมาซ้ำ 5–10 ครั้งต่อวินาที</p>
+        <img class="diagram" src="../../assets/lessons/ep12-lidar-scan.png" alt="LiDAR 2D ยิงเลเซอร์รอบตัวและวัดระยะถึงผนังและสิ่งกีดขวาง">
+        <ul>
+            <li><strong>ข้อดี:</strong> แม่นยำ ไม่ขึ้นกับแสงในห้อง ใช้สร้างแผนที่ (EP13) และหลบสิ่งกีดขวาง (EP14) ได้</li>
+            <li><strong>ข้อจำกัด:</strong> เห็นเฉพาะระนาบเดียว (2D) กระจกและวัตถุโปร่งใสอาจวัดไม่ได้</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>2. ข้อมูล LaserScan</h3>
+        <p>LiDAR ส่งข้อมูลผ่าน Topic <code>/scan</code> ด้วยชนิด <code>sensor_msgs/msg/LaserScan</code></p>
+<div class="table-wrap"><table>
+<thead><tr><th>ฟิลด์</th><th>ความหมาย</th></tr></thead>
+<tbody>
+<tr><td><code>header.frame_id</code></td><td>Frame ของ LiDAR เช่น laser_frame (ต้องมี TF จาก EP9)</td></tr>
+<tr><td><code>angle_min / angle_max</code></td><td>มุมเริ่มและมุมสิ้นสุดของการสแกน (เรเดียน)</td></tr>
+<tr><td><code>angle_increment</code></td><td>มุมที่ห่างกันระหว่างค่าแต่ละช่อง (เรเดียน)</td></tr>
+<tr><td><code>range_min / range_max</code></td><td>ระยะที่เซนเซอร์วัดได้ (เมตร) ค่านอกช่วงนี้ไม่น่าเชื่อถือ</td></tr>
+<tr><td><code>scan_time</code></td><td>เวลาที่ใช้หมุนครบหนึ่งรอบ (วินาที)</td></tr>
+<tr><td><code>ranges[ ]</code></td><td>อาร์เรย์ระยะ (เมตร) เรียงตามมุมจาก angle_min</td></tr>
+<tr><td><code>intensities[ ]</code></td><td>ความแรงของสัญญาณสะท้อน (บางรุ่นเท่านั้น)</td></tr>
+</tbody></table></div>
+        <img class="diagram" src="../../assets/lessons/ep12-laserscan-array.png" alt="ranges เป็นอาร์เรย์ของระยะ พร้อมสูตรแปลงตำแหน่งช่องเป็นมุม และค่า inf และ nan">
+<div class="alert-box"><strong>⚠️ ระวังค่าพิเศษ:</strong> <code>inf</code> คือไม่พบวัตถุในระยะวัด และ <code>nan</code> คือค่าอ่านเสีย ถ้าไม่ตรวจก่อนนำไปคำนวณ เช่น หาค่าต่ำสุด โปรแกรมอาจได้คำตอบผิดหรือหยุดทำงาน</div>
+    </div>
+
+    <div class="section-box">
+        <h3>3. เชื่อมต่อ LiDAR จริง</h3>
+        <p>ขั้นตอนทั่วไปเหมือนกันทุกรุ่น ส่วนชื่อ Package และไฟล์ Launch ให้ดูตามคู่มือผู้ผลิตของรุ่นที่ใช้ (เช่น Slamtec RPLIDAR, LDROBOT LD19, YDLIDAR)</p>
+        <ol>
+            <li>ต่อ LiDAR เข้าคอมพิวเตอร์หรือ Raspberry Pi แล้วตรวจชื่อพอร์ต: <code>ls -l /dev/ttyUSB* /dev/ttyACM*</code></li>
+            <li>ถ้าขึ้น Permission denied ให้เพิ่มผู้ใช้เข้ากลุ่ม <code>dialout</code> (เหมือน EP7)</li>
+            <li>ติดตั้ง ROS 2 Driver ของรุ่นนั้น แล้วสั่ง Launch ตามคู่มือ</li>
+            <li>ตั้ง <code>frame_id</code> ของ Driver ให้ตรงกับ Frame ที่มี TF เช่น <code>laser_frame</code></li>
+            <li>ตรวจว่ามี Topic: <code>ros2 topic list | grep scan</code></li>
+        </ol>
+<div class="highlight"><strong>ยังไม่มี LiDAR?</strong> ใช้ Node จำลองในหัวข้อ 5 ฝึกได้ทุกขั้นตอนต่อจากนี้</div>
+    </div>
+
+    <div class="section-box">
+        <h3>4. ตรวจสอบ /scan จาก Terminal</h3>
+<div class="code-block">source /opt/ros/jazzy/setup.bash
+
+ros2 topic info /scan -v          # ดูชนิดข้อมูลและ QoS
+ros2 topic hz /scan               # ตรวจอัตราการส่ง
+ros2 topic echo /scan --once --field angle_min
+ros2 topic echo /scan --once --field angle_increment
+ros2 topic echo /scan --once --field range_max</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> <code>hz</code> ใกล้ 5–10 Hz (ตามรุ่น), <code>angle_min</code> เป็นลบ เช่น −3.14 และ <code>range_max</code> ตรงกับสเปกเซนเซอร์</div>
+    </div>
+
+    <div class="section-box">
+        <h3>5. เขียน Node ฝึกใช้ LaserScan</h3>
+<div class="code-block">mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+ros2 pkg create --build-type ament_python brobot_lidar \
+  --dependencies rclpy sensor_msgs</div>
+        <h4><code>fake_scan.py</code> — จำลอง LiDAR</h4>
+        <p>ไฟล์ <code>~/ros2_ws/src/brobot_lidar/brobot_lidar/fake_scan.py</code> ห้องสี่เหลี่ยม 4×4 เมตร มีสิ่งกีดขวางโผล่หน้าหุ่นยนต์ทุก 5 วินาที</p>
+<div class="code-block">import math
+
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
+
+
+class FakeScan(Node):
+    &quot;&quot;&quot;จำลอง LiDAR ในห้องสี่เหลี่ยม 4x4 เมตร ใช้ฝึกเมื่อยังไม่มีเซนเซอร์จริง&quot;&quot;&quot;
+
+    def __init__(self):
+        super().__init__(&#x27;fake_scan&#x27;)
+        self.count = 360
+        self.tick = 0
+        self.pub = self.create_publisher(LaserScan, &#x27;scan&#x27;, qos_profile_sensor_data)
+        self.timer = self.create_timer(0.1, self.publish_scan)
+        self.get_logger().info(&#x27;Fake LiDAR publishing /scan at 10 Hz&#x27;)
+
+    def publish_scan(self):
+        msg = LaserScan()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.header.frame_id = &#x27;laser_frame&#x27;
+        msg.angle_min = -math.pi
+        msg.angle_increment = 2.0 * math.pi / self.count
+        msg.angle_max = msg.angle_min + (self.count - 1) * msg.angle_increment
+        msg.scan_time = 0.1
+        msg.time_increment = msg.scan_time / self.count
+        msg.range_min = 0.12
+        msg.range_max = 12.0
+
+        ranges = []
+        for i in range(self.count):
+            angle = msg.angle_min + i * msg.angle_increment
+            c, s = abs(math.cos(angle)), abs(math.sin(angle))
+            r = min(2.0 / c if c &gt; 1e-6 else math.inf,
+                    2.0 / s if s &gt; 1e-6 else math.inf)
+            # สลับทุก 5 วินาที: มีสิ่งกีดขวางโผล่หน้าหุ่นยนต์ที่ระยะ 0.45 เมตร
+            if abs(angle) &lt; math.radians(15) and (self.tick // 50) % 2 == 1:
+                r = 0.45
+            # จำลองมุมด้านหลังที่อ่านค่าไม่ได้
+            if abs(angle) &gt; math.radians(175):
+                r = math.inf
+            ranges.append(r)
+        msg.ranges = ranges
+        self.pub.publish(msg)
+        self.tick += 1
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = FakeScan()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == &#x27;__main__&#x27;:
+    main()</div>
+        <h4><code>obstacle_monitor.py</code> — ตรวจสิ่งกีดขวางด้านหน้า</h4>
+        <p>ไฟล์ <code>~/ros2_ws/src/brobot_lidar/brobot_lidar/obstacle_monitor.py</code> หาระยะที่ใกล้ที่สุดในมุมหน้า ±30° และเตือนเมื่อใกล้กว่า 0.5 เมตร</p>
+<div class="code-block">import math
+
+import rclpy
+from rclpy.node import Node
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
+
+
+class ObstacleMonitor(Node):
+    def __init__(self):
+        super().__init__(&#x27;obstacle_monitor&#x27;)
+        self.declare_parameter(&#x27;stop_distance&#x27;, 0.5)    # เมตร
+        self.declare_parameter(&#x27;front_angle_deg&#x27;, 30.0) # ตรวจ +-30 องศาด้านหน้า
+        self.stop_distance = self.get_parameter(&#x27;stop_distance&#x27;).value
+        self.front_angle = math.radians(self.get_parameter(&#x27;front_angle_deg&#x27;).value)
+        self.create_subscription(
+            LaserScan, &#x27;scan&#x27;, self.scan_callback, qos_profile_sensor_data)
+
+    def scan_callback(self, msg):
+        closest = math.inf
+        for i, r in enumerate(msg.ranges):
+            # ข้ามค่า inf / nan และค่านอกช่วงที่เซนเซอร์วัดได้
+            if not math.isfinite(r) or r &lt; msg.range_min or r &gt; msg.range_max:
+                continue
+            angle = msg.angle_min + i * msg.angle_increment
+            angle = math.atan2(math.sin(angle), math.cos(angle))  # ปรับให้อยู่ใน -pi..pi
+            if abs(angle) &lt;= self.front_angle and r &lt; closest:
+                closest = r
+
+        if closest &lt; self.stop_distance:
+            self.get_logger().warning(
+                f&#x27;Obstacle ahead: {closest:.2f} m&#x27;, throttle_duration_sec=1.0)
+        else:
+            self.get_logger().info(
+                f&#x27;Path clear (closest {closest:.2f} m)&#x27;, throttle_duration_sec=1.0)
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = ObstacleMonitor()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+if __name__ == &#x27;__main__&#x27;:
+    main()</div>
+<div class="highlight"><strong>ทำไมใช้ <code>qos_profile_sensor_data</code>?</strong> LiDAR ส่งแบบ Best Effort (เน้นเร็ว ยอมให้ข้อมูลบางชุดหายได้) Subscriber ต้องใช้ QoS ที่เข้ากัน ไม่เช่นนั้นอาจไม่ได้รับข้อมูลเลย (ตรงกับหัวข้อ QoS ใน EP4)</div>
+    </div>
+
+    <div class="section-box">
+        <h3>6. ลงทะเบียนและรัน</h3>
+        <p>แก้ <code>setup.py</code>:</p>
+<div class="code-block">entry_points={
+    &#x27;console_scripts&#x27;: [
+        &#x27;fake_scan = brobot_lidar.fake_scan:main&#x27;,
+        &#x27;obstacle_monitor = brobot_lidar.obstacle_monitor:main&#x27;,
+    ],
+},</div>
+<div class="code-block">cd ~/ros2_ws
+colcon build --symlink-install --packages-select brobot_lidar
+source install/setup.bash
+
+# Terminal 1 (ข้ามถ้าใช้ LiDAR จริง)
+ros2 run brobot_lidar fake_scan
+
+# Terminal 2
+ros2 run brobot_lidar obstacle_monitor --ros-args -p stop_distance:=0.5</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> ข้อความ <code>Path clear</code> สลับกับ <code>Obstacle ahead: 0.45 m</code> ทุกประมาณ 5 วินาที</div>
+    </div>
+
+    <div class="section-box">
+        <h3>7. ดูภาพ LiDAR ใน RViz2</h3>
+<div class="code-block"># ถ้าใช้ Node จำลอง ต้องมี TF ของ laser_frame ก่อน (จาก EP9)
+ros2 run tf2_ros static_transform_publisher \
+  --x 0.0 --y 0.0 --z 0.20 \
+  --frame-id base_link --child-frame-id laser_frame
+
+rviz2</div>
+        <ol>
+            <li>ตั้ง Fixed Frame เป็น <code>base_link</code></li>
+            <li>Add → LaserScan แล้วเลือก Topic เป็น <code>/scan</code></li>
+            <li>ใน LaserScan → Topic → Reliability Policy เลือก <b>Best Effort</b></li>
+            <li>เพิ่ม Size เป็น 0.05 เพื่อให้เห็นจุดชัดขึ้น</li>
+        </ol>
+<div class="alert-box"><strong>⚠️ RViz2 ไม่แสดงจุด?</strong> สาเหตุที่พบบ่อยที่สุดคือ Reliability Policy ไม่ตรงกัน (ต้องเป็น Best Effort) รองลงมาคือ Fixed Frame ผิดหรือไม่มี TF ไปยัง <code>laser_frame</code></div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 12.1 — เขียนระบบเตือนสิ่งกีดขวาง</h3>
+<div class="lab-box">        <ol>
+            <li>รัน <code>fake_scan</code> และ <code>obstacle_monitor</code> ดูข้อความเตือน</li>
+            <li>เปลี่ยน <code>stop_distance</code> เป็น 0.3 และ 0.8 แล้วสังเกตว่าข้อความเตือนเปลี่ยนไปอย่างไร</li>
+            <li>เปลี่ยน <code>front_angle_deg</code> เป็น 90 แล้วอธิบายสิ่งที่เปลี่ยน</li>
+            <li>(ถ้ามี LiDAR จริง) ใช้มือบังหน้าเซนเซอร์ที่ระยะต่างๆ แล้วเทียบกับค่าที่อ่านได้</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> ข้อความเตือนขึ้นเมื่อสิ่งกีดขวางอยู่ใกล้กว่าค่าที่ตั้ง และไม่ขึ้นเมื่อมีแต่ค่า inf / nan</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 12.2 — หาทิศทางที่โล่งที่สุด</h3>
+<div class="lab-box">        <ol>
+            <li>แก้ <code>obstacle_monitor.py</code> ให้หาช่องที่มีระยะไกลที่สุด (ที่ค่าไม่ใช่ inf / nan)</li>
+            <li>แปลงตำแหน่งช่องเป็นมุม ด้วย <code>angle_min + i × angle_increment</code></li>
+            <li>แสดงผลเป็นองศา เช่น <code>Most open direction: 35 deg</code></li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> ผลลัพธ์ตรงกับที่เห็นใน RViz2</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td>RViz2 ไม่แสดงจุด</td><td>ตั้ง Reliability เป็น Best Effort และตรวจ Fixed Frame / TF</td></tr>
+<tr><td>Log ขึ้น Message Filter dropping message: frame ...</td><td>frame_id ของ /scan ไม่มี TF ตรวจชื่อ Frame ให้ตรงกับ static transform</td></tr>
+<tr><td>ranges เป็น inf ทั้งหมด</td><td>เซนเซอร์ถูกบัง ระยะเกิน range_max หรือ Driver ตั้งค่าไม่ถูก</td></tr>
+<tr><td>ภาพกลับด้านหรือหมุนผิดทิศ</td><td>ตรวจ yaw ใน static TF ว่าตรงกับทิศที่ติดตั้ง LiDAR จริง</td></tr>
+<tr><td>ข้อมูลกระตุกหรืออัตราต่ำ</td><td>ตรวจ ros2 topic hz, สายและแหล่งจ่ายไฟ, baud rate ของรุ่นนั้น</td></tr>
+<tr><td>ค่า min ผิดพลาด</td><td>กรอง inf / nan และค่านอก range_min–range_max ก่อนหาค่าต่ำสุด</td></tr>
+</tbody></table></div>
+    </div>
+</body>
+</html>

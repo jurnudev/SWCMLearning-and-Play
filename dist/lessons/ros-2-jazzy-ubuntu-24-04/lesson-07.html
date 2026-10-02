@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EP7 - Custom Serial Protocol (STM32 + ROS 2)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.success-box{background-color:#f0fdf4;border-left:4px solid #22c55e;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.lab-box{background-color:#fffbeb;border:2px dashed #f59e0b;padding:1.25rem;border-radius:8px;margin:1rem 0}.table-wrap{overflow-x:auto}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}</style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep7.jpg" alt="หน้าปก EP7 - Custom Serial Protocol (STM32 + ROS 2)">
+
+    <h1 class="hero-title">EP7</h1>
+    <h2 style="text-align:center">Custom Serial Protocol — STM32 ↔ ROS 2</h2>
+    <p class="subtitle">"ROS 2 Jazzy • Packet framing, checksum, resynchronization และ Python bridge ที่ตรวจสอบข้อมูลจริง"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>ออกแบบ Binary Packet ที่แบ่งเขตข้อมูลชัดเจน</li>
+            <li>ส่งข้อมูล <code>int16</code> จาก STM32 แบบกำหนด Byte Order</li>
+            <li>เขียน ROS 2 Node ที่หา Header ใหม่เมื่อข้อมูลหลุดเฟรม</li>
+            <li>ตรวจ Checksum ก่อน Publish และวิเคราะห์ปัญหา Serial ได้</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>1. ภาพรวมระบบ</h3>
+        <p>STM32 อ่าน Encoder/ควบคุม Motor → ส่ง UART → PC หรือ Raspberry Pi อ่าน Serial → ROS 2 Bridge แปลงเป็น Topic</p>
+<div class="alert-box"><strong>⚠️ Safety:</strong> ต่อ GND ร่วมกัน, ใช้ระดับสัญญาณ 3.3 V ให้ตรงกับบอร์ด และตรวจ TX↔RX ก่อนจ่ายไฟ ห้ามนำ 5 V logic เข้าขา STM32 โดยไม่ตรวจ Datasheet</div>
+    </div>
+
+    <div class="section-box">
+        <h3>2. กำหนด Packet</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Offset</th><th>ชื่อ</th><th>ค่า/ขนาด</th></tr></thead>
+<tbody>
+<tr><td>0–1</td><td>Header</td><td>0xFF 0xFE</td></tr>
+<tr><td>2</td><td>CMD</td><td>0x01 = Encoder</td></tr>
+<tr><td>3–4</td><td>Left</td><td>int16, Big-endian</td></tr>
+<tr><td>5–6</td><td>Right</td><td>int16, Big-endian</td></tr>
+<tr><td>7</td><td>Checksum</td><td>XOR ของ byte 2–6</td></tr>
+<tr><td>8</td><td>Tail</td><td>0xFD</td></tr>
+</tbody></table></div>
+<div class="highlight">Packet ยาวคงที่ 9 bytes ตัวอย่างนี้เหมาะกับ Lab หากใช้จริงควรเพิ่ม Length, Sequence, CRC-16 และ Timeout/Failsafe</div>
+        <img class="diagram" src="../../assets/lessons/ep7-packet-layout.png" alt="ตำแหน่งแต่ละ byte ใน Packet 9 bytes พร้อมตัวอย่างค่าและ Checksum">
+    </div>
+
+    <div class="section-box">
+        <h3>3. Firmware ฝั่ง STM32</h3>
+        <p>ตัวอย่าง Arduino Core for STM32 ส่งค่าทุก 50 ms (20 Hz):</p>
+<div class="code-block">#include &lt;Arduino.h&gt;
+
+void sendEncoder(int16_t left, int16_t right) {
+  uint8_t p[9];
+  p[0] = 0xFF;
+  p[1] = 0xFE;
+  p[2] = 0x01;
+  p[3] = (uint16_t(left) &gt;&gt; 8) &amp; 0xFF;
+  p[4] = uint16_t(left) &amp; 0xFF;
+  p[5] = (uint16_t(right) &gt;&gt; 8) &amp; 0xFF;
+  p[6] = uint16_t(right) &amp; 0xFF;
+  p[7] = p[2] ^ p[3] ^ p[4] ^ p[5] ^ p[6];
+  p[8] = 0xFD;
+  Serial1.write(p, sizeof(p));
+}
+
+void setup() {
+  Serial1.begin(115200);
+}
+
+void loop() {
+  static int16_t left_ticks = 250;
+  static int16_t right_ticks = -150;
+  sendEncoder(left_ticks, right_ticks);
+  delay(50);
+}</div>
+        <h4>อธิบาย Code</h4>
+        <ul>
+            <li>Cast เป็น <code>uint16_t</code> ก่อน shift เพื่อให้การแยก byte ของค่าติดลบชัดเจน</li>
+            <li>Big-endian หมายถึงส่ง High byte ก่อน Low byte ฝั่ง Python จึงใช้ <code>&gt;hh</code></li>
+            <li>Checksum ต้องคำนวณและตรวจด้วยกติกาเดียวกันทั้งสองฝั่ง</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>4. เตรียม Linux และสิทธิ์ Serial</h3>
+<div class="code-block">source /opt/ros/jazzy/setup.bash
+sudo apt update
+sudo apt install -y python3-serial
+
+# เสียบอุปกรณ์แล้วตรวจชื่อพอร์ต
+ls -l /dev/ttyUSB* /dev/ttyACM* 2&gt;/dev/null</div>
+        <p>หาก <code>Permission denied</code>:</p>
+<div class="code-block">sudo usermod -aG dialout $USER
+# จากนั้น Sign out แล้ว Sign in ใหม่</div>
+<div class="alert-box">อย่าแก้ด้วย <code>sudo chmod 777 /dev/ttyUSB0</code> เป็นวิธีถาวร เพราะสิทธิ์หายเมื่อเสียบอุปกรณ์ใหม่และเปิดกว้างเกินจำเป็น</div>
+    </div>
+
+    <div class="section-box">
+        <h3>5. สร้าง ROS 2 Package</h3>
+<div class="code-block">mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+ros2 pkg create --build-type ament_python stm32_bridge_pkg \
+  --dependencies rclpy std_msgs</div>
+        <p>สร้างไฟล์ <code>~/ros2_ws/src/stm32_bridge_pkg/stm32_bridge_pkg/bridge_node.py</code></p>
+<div class="code-block">import struct
+import serial
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Int32MultiArray
+
+
+class STM32Bridge(Node):
+    HEADER = b&#x27;\xff\xfe&#x27;
+    PACKET_SIZE = 9
+
+    def __init__(self):
+        super().__init__(&#x27;stm32_bridge&#x27;)
+        self.declare_parameter(&#x27;port&#x27;, &#x27;/dev/ttyUSB0&#x27;)
+        self.declare_parameter(&#x27;baud&#x27;, 115200)
+        port = self.get_parameter(&#x27;port&#x27;).value
+        baud = self.get_parameter(&#x27;baud&#x27;).value
+
+        self.serial = serial.Serial(port, baud, timeout=0)
+        self.buffer = bytearray()
+        self.publisher = self.create_publisher(
+            Int32MultiArray, &#x27;wheel_encoder_ticks&#x27;, 10)
+        self.timer = self.create_timer(0.01, self.read_serial)
+        self.get_logger().info(f&#x27;Opened {port} at {baud} baud&#x27;)
+
+    def read_serial(self):
+        waiting = self.serial.in_waiting
+        if waiting:
+            self.buffer.extend(self.serial.read(waiting))
+        self.parse_buffer()
+
+    def parse_buffer(self):
+        while True:
+            start = self.buffer.find(self.HEADER)
+            if start &lt; 0:
+                # เก็บ 0xFF สุดท้ายไว้ เผื่อเป็นต้น Header รอบถัดไป
+                self.buffer[:] = self.buffer[-1:] if self.buffer[-1:] == b&#x27;\xff&#x27; else b&#x27;&#x27;
+                return
+            if start &gt; 0:
+                del self.buffer[:start]
+            if len(self.buffer) &lt; self.PACKET_SIZE:
+                return
+
+            packet = bytes(self.buffer[:self.PACKET_SIZE])
+            if packet[8] != 0xFD:
+                del self.buffer[0]
+                continue
+
+            checksum = packet[2] ^ packet[3] ^ packet[4] ^ packet[5] ^ packet[6]
+            if packet[7] != checksum:
+                self.get_logger().warning(&#x27;Checksum mismatch&#x27;)
+                del self.buffer[0]
+                continue
+
+            if packet[2] == 0x01:
+                left, right = struct.unpack(&#x27;&gt;hh&#x27;, packet[3:7])
+                msg = Int32MultiArray()
+                msg.data = [left, right]
+                self.publisher.publish(msg)
+
+            del self.buffer[:self.PACKET_SIZE]
+
+    def destroy_node(self):
+        if self.serial.is_open:
+            self.serial.close()
+        super().destroy_node()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = STM32Bridge()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == &#x27;__main__&#x27;:
+    main()</div>
+        <h4>ทำไมต้องใช้ Buffer?</h4>
+<div class="highlight"><code>serial.read()</code> อาจคืนข้อมูลไม่ครบหนึ่ง Packet และ Stream อาจเริ่มกลาง Packet ได้ การสะสม byte แล้วค้น Header ช่วย Resynchronize โดยไม่สมมติว่าทุกครั้งจะอ่านได้ 9 byte พอดี</div>
+    </div>
+
+    <div class="section-box">
+        <h3>6. ลงทะเบียนคำสั่ง Run</h3>
+        <p>แก้ <code>setup.py</code>:</p>
+<div class="code-block">entry_points={
+    &#x27;console_scripts&#x27;: [
+        &#x27;bridge_node = stm32_bridge_pkg.bridge_node:main&#x27;,
+    ],
+},</div>
+        <p>ตรวจว่า <code>package.xml</code> มี dependency ที่คำสั่งสร้าง Package ใส่ให้แล้ว</p>
+    </div>
+
+    <div class="section-box">
+        <h3>7. Build, Run และตรวจผล</h3>
+<div class="code-block">cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install --packages-select stm32_bridge_pkg
+source install/setup.bash
+ros2 run stm32_bridge_pkg bridge_node \
+  --ros-args -p port:=/dev/ttyUSB0 -p baud:=115200</div>
+        <p><strong>Terminal ใหม่:</strong></p>
+<div class="code-block">source /opt/ros/jazzy/setup.bash
+source ~/ros2_ws/install/setup.bash
+ros2 topic info /wheel_encoder_ticks
+ros2 topic echo /wheel_encoder_ticks</div>
+<div class="success-box"><strong>✅ Expected Result:</strong> ได้ array สองค่า เช่น <code>data: [250, -150]</code> ต่อเนื่องประมาณ 20 Hz และไม่มีคำเตือน Checksum</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 7.1 — ทดสอบความทนทาน</h3>
+<div class="lab-box">        <ol>
+            <li>เปลี่ยน Baud ฝั่ง ROS 2 ให้ผิดและสังเกตอาการ</li>
+            <li>คืนค่าให้ตรง แล้วแก้ Firmware ให้ Checksum ผิด 1 byte</li>
+            <li>ยืนยันว่า Node ไม่ Publish Packet เสียและ Log ขึ้น <code>Checksum mismatch</code></li>
+            <li>เพิ่ม Topic <code>/serial_packet_errors</code> สำหรับนับ Error</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> ระบบกลับมารับ Packet ถูกต้องได้เองหลังเจอข้อมูลเสีย โดยไม่ต้อง Restart Node</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td>Permission denied</td><td>เพิ่มผู้ใช้ในกลุ่ม dialout แล้ว Login ใหม่</td></tr>
+<tr><td>พอร์ตหาย/สลับชื่อ</td><td>ตรวจ dmesg, ls -l /dev/serial/by-id/ และใช้ path แบบ by-id</td></tr>
+<tr><td>ค่าติดลบเพี้ยน</td><td>ตรวจ Signed int16 และ Endianness ให้ตรงกัน</td></tr>
+<tr><td>Checksum mismatch ต่อเนื่อง</td><td>ตรวจ Baud, Ground, สาย, Logic level และกติกา Checksum</td></tr>
+<tr><td>Topic ไม่มีข้อมูล</td><td>ตรวจว่า CMD=0x01, Tail=0xFD และ Node เปิดพอร์ตสำเร็จ</td></tr>
+</tbody></table></div>
+    </div>
+
+</body>
+</html>

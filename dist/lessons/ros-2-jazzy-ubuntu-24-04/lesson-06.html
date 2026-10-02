@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EP6 - ROS 2 Launch Files</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.success-box{background-color:#f0fdf4;border-left:4px solid #22c55e;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.lab-box{background-color:#fffbeb;border:2px dashed #f59e0b;padding:1.25rem;border-radius:8px;margin:1rem 0}.table-wrap{overflow-x:auto}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}</style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep6.jpg" alt="หน้าปก EP6 - ROS 2 Launch Files">
+
+    <h1 class="hero-title">EP6</h1>
+    <h2 style="text-align:center">ROS 2 Launch Files</h2>
+    <p class="subtitle">"เจาะลึกการทำงานของสคริปต์สั่งรันอัตโนมัติ"</p>
+
+    <div class="section-box">
+        <h3>1. ทำไมต้องมี Launch Files?</h3>
+        <p>ในโลกของหุ่นยนต์จริง เราอาจต้องรันโปรแกรมย่อยๆ พร้อมกันนับสิบตัว <strong>Launch File</strong> คือสคริปต์ Python ที่ทำหน้าที่เป็น "ผู้จัดการระบบ" ช่วยเปิด Node ทุกตัวให้เราในคำสั่งเดียว</p>
+        <img class="diagram" src="../../assets/lessons/ep6-launch-flow.png" alt="คำสั่ง ros2 launch อ่าน robot_app.launch.py แล้วเปิด station_node และ listener_node พร้อมกัน">
+    </div>
+
+    <div class="section-box">
+        <h3>2. การสร้างไฟล์สคริปต์</h3>
+        <p>สร้างโฟลเดอร์ <code>launch</code> และไฟล์ <code>robot_app.launch.py</code> ดังนี้:</p>
+        <h4><code>robot_app.launch.py</code></h4>
+<div class="code-block">from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package=&#x27;my_robot_controller&#x27;,
+            executable=&#x27;news_station&#x27;,
+            name=&#x27;station_node&#x27;
+        ),
+        Node(
+            package=&#x27;my_robot_controller&#x27;,
+            executable=&#x27;news_listener&#x27;,
+            name=&#x27;listener_node&#x27;
+        )
+    ])</div>
+    </div>
+
+    <div class="section-box">
+        <h3>3. เจาะลึกการทำงานของโค้ด</h3>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h4>📦 การนำเข้า Library</h4>
+                <p>เราระบุ <code>LaunchDescription</code> เพื่อสร้างใบสั่งงาน และ <code>Node</code> เพื่อบอกระบบว่าจะเปิดโปรแกรมตัวไหนจาก Package ไหน</p>
+            </div>
+            <div class="flex-item">
+                <h4>🔑 ฟังก์ชัน <code>generate_launch_description()</code></h4>
+                <p>นี่คือหัวใจหลัก! ROS 2 จะมองหาฟังก์ชันชื่อนี้เสมอ ถ้าตั้งชื่ออื่น ระบบจะหาทางรันไฟล์นี้ไม่เจอ โดยเราต้อง return รายการของ Node ออกไปเป็น List <code>[ ]</code></p>
+            </div>
+            <div class="flex-item">
+                <h4>⚙️ ส่วนประกอบของ Node Action</h4>
+                <p><code>package</code>: ชื่อกล่องเก็บโค้ดที่เราสร้างใน EP5<br><code>executable</code>: ชื่อเรียกที่เราลงทะเบียนไว้ใน <code>setup.py</code><br><code>name</code>: ชื่อที่เราต้องการให้ปรากฏในระบบ (สามารถเปลี่ยนชื่อได้ที่นี่โดยไม่ต้องแก้โค้ดหลัก)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>4. ทำไมต้องแก้ <code>setup.py</code>?</h3>
+        <p><em>"การเขียนไฟล์เสร็จ ไม่ได้หมายความว่าระบบจะหาเจอ"</em></p>
+        <p>ตามปกติระบบ ROS 2 จะมองหาไฟล์ที่อยู่ในโฟลเดอร์ <code>install</code> เท่านั้น การเพิ่มโค้ดใน <code>data_files</code> คือการสั่งให้ระบบก๊อปปี้ไฟล์ในโฟลเดอร์ <code>launch</code> ของเราไปวางในโฟลเดอร์ระบบด้วยทุกครั้งที่เราสั่ง <code>colcon build</code></p>
+        <h4><code>setup.py</code></h4>
+<div class="code-block"># บรรทัดนี้บอกระบบว่า &quot;ไปดึงไฟล์นามสกุล .py ทั้งหมดในโฟลเดอร์ launch มาติดตั้งด้วย&quot;
+(os.path.join(&#x27;share&#x27;, package_name, &#x27;launch&#x27;), glob(os.path.join(&#x27;launch&#x27;, &#x27;*launch.[pxy][yma]*&#x27;))),</div>
+<div class="alert-box"><strong>⚠️ อย่าลืม import</strong> บรรทัดนี้ใช้ <code>os</code> และ <code>glob</code> ต้องมีที่ต้นไฟล์ <code>setup.py</code>:<br><code>import os</code><br><code>from glob import glob</code><br>และบรรทัดนี้ต้องอยู่ในลิสต์ <code>data_files=[ ... ]</code></div>
+    </div>
+
+    <div class="section-box">
+        <h3>5. ลำดับการทำงานเมื่อสั่งรัน</h3>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h4><span class="step-badge">1</span> System Check</h4>
+                <p>ROS 2 เข้าไปหาไฟล์ในโฟลเดอร์ <code>share</code> ของระบบ</p>
+            </div>
+            <div class="flex-item">
+                <h4><span class="step-badge">2</span> Execute Python</h4>
+                <p>ระบบรันฟังก์ชัน <code>generate_launch_description()</code> เพื่ออ่านใบสั่งงาน</p>
+            </div>
+            <div class="flex-item">
+                <h4><span class="step-badge">3</span> Multi-Run</h4>
+                <p>ระบบสั่งเปิด Node ทั้งหมดที่ระบุไว้พร้อมกัน โดยรวมหน้าจอ Terminal มาไว้ที่เดียว</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <h3>ทดสอบคำสั่งสุดท้าย</h3>
+<div class="code-block">ros2 launch my_robot_controller robot_app.launch.py</div>
+<div class="success-box"><em>"เพียงคำสั่งเดียว คุณจะเห็นหุ่นยนต์ทั้งระบบเริ่มทำงานทันที!"</em></div>
+    </div>
+
+</body>
+</html>

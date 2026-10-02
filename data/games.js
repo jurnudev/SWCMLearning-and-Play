@@ -20,14 +20,33 @@ const games = [
         status: "completed"
     },
     {
-        id: "lesson-001",
-        title: "ทำความรู้จัก ROS 2 Jazzy",
-        description: "จาก Humble สู่ Jazzy — ก้าวสำคัญของหุ่นยนต์อัจฉริยะบน Ubuntu 24.04",
-        category: "Robotics",
-        image: "assets/games/ros2-jazzy-cover.jpg",
-        url: "lessons/ros-2-jazzy-ubuntu-24-04/index.html",
-        updatedAt: "2026-10-02",
-        status: "development",
-        buttonText: "เข้าดูบทเรียน"
+        id: "game-003",
+        title: "AR Spider-Dino",
+        description: "ใช้ท่าทางมือยิงใยจับไดโนเสาร์ไทยและไดโนเสาร์โลกให้ครบ 18 สายพันธุ์ ผ่านกล้อง AR",
+        category: "Science",
+        image: "assets/games/game-003.png",
+        url: "https://taken89.github.io/ar-spider-dino/",
+        updatedAt: "2026-10-03",
+        status: "completed"
+    },
+    {
+        id: "game-004",
+        title: "AR Trash Hunter Pro",
+        description: "60 ภารกิจแยกขยะใน 60 วินาที เรียนรู้การทิ้งขยะให้ถูกถัง ปลูกจิตสำนึกพิทักษ์โลก",
+        category: "Environment",
+        image: "assets/games/game-004.png",
+        url: "https://taken89.github.io/ar-trash-hunter/",
+        updatedAt: "2026-10-03",
+        status: "completed"
+    },
+    {
+        id: "game-005",
+        title: "คณิตศาสตร์ AR มหาสนุก",
+        description: "รวมเกมคณิตศาสตร์ 5 โหมด บวก ลบ คูณ หาร และเรียงตัวเลข เล่นด้วยท่าทางมือ ในฉากสนุกๆ 5 แบบ",
+        category: "Mathematics",
+        image: "assets/games/game-005.png",
+        url: "https://taken89.github.io/math-hub/",
+        updatedAt: "2026-10-03",
+        status: "completed"
     }
 ];

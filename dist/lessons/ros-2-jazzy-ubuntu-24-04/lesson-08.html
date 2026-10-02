@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EP8 - Encoder, PWM และ PID Speed Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.success-box{background-color:#f0fdf4;border-left:4px solid #22c55e;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.lab-box{background-color:#fffbeb;border:2px dashed #f59e0b;padding:1.25rem;border-radius:8px;margin:1rem 0}.table-wrap{overflow-x:auto}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}</style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep8.jpg" alt="หน้าปก EP8 - Encoder, PWM และ PID Control">
+
+    <h1 class="hero-title">EP8</h1>
+    <h2 style="text-align:center">Encoder, PWM และ PID Speed Control</h2>
+    <p class="subtitle">"ROS 2 Jazzy • คำนวณความเร็วด้วยเวลาจริง ใช้ Anti-windup และทดสอบแบบเป็นขั้นตอน"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>อ่าน Quadrature Encoder ด้วย Interrupt อย่างปลอดภัย</li>
+            <li>แปลงจำนวน Tick เป็นรอบต่อนาที (RPM)</li>
+            <li>คำนวณ PID ด้วย <code>dt</code> ไม่ผูกกับความเร็ว Loop</li>
+            <li>จำกัด Integral/Output และจูน Kp, Ki, Kd อย่างมีระบบ</li>
+        </ul>
+<div class="alert-box"><strong>⚠️ Safety:</strong> ทดสอบโดยยกล้อพ้นพื้นก่อน ตั้ง PWM limit ต่ำ และเตรียมสวิตช์ตัดไฟ มอเตอร์อาจหมุนทันทีเมื่อโปรแกรมเริ่ม</div>
+    </div>
+
+    <div class="section-box">
+        <h3>1. สมการที่ต้องรู้</h3>
+        <p>เมื่อวัดได้ Δtick ในช่วงเวลา Δt:</p>
+<div class="code-block">revolutions = delta_ticks / ticks_per_revolution
+rpm = revolutions / dt_seconds * 60.0
+error = target_rpm - measured_rpm
+output = Kp*error + Ki*integral(error*dt) + Kd*(error-prev_error)/dt</div>
+<div class="highlight"><code>ticks_per_revolution</code> ต้องตรงกับโหมด Decode (x1/x2/x4) และ Gear ratio ของ Encoder จริง</div>
+        <img class="diagram" src="../../assets/lessons/ep8-pid-loop.png" alt="วงควบคุมความเร็ว PID: target เทียบกับ RPM จาก Encoder แล้วปรับ PWM ไปที่มอเตอร์">
+    </div>
+
+    <div class="section-box">
+        <h3>2. ต่อวงจรและกำหนดขา</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>สัญญาณ</th><th>ตัวอย่าง</th><th>หมายเหตุ</th></tr></thead>
+<tbody>
+<tr><td>Encoder A/B</td><td>PA0 / PA1</td><td>ขาที่รองรับ Interrupt; ตรวจ Voltage</td></tr>
+<tr><td>PWM</td><td>PA8</td><td>ขา Timer PWM</td></tr>
+<tr><td>DIR1 / DIR2</td><td>PB0 / PB1</td><td>ไป Motor Driver</td></tr>
+<tr><td>GND</td><td>Common Ground</td><td>ต้องต่อร่วม MCU–Driver–Encoder</td></tr>
+</tbody></table></div>
+    </div>
+
+    <div class="section-box">
+        <h3>3. โค้ด Encoder + PID ฉบับรวม</h3>
+        <p>ตัวอย่าง Arduino Core for STM32 แบบ Single-channel interrupt + อ่านทิศทางจาก B:</p>
+<div class="code-block">#include &lt;Arduino.h&gt;
+
+const uint8_t ENCA = PA0;
+const uint8_t ENCB = PA1;
+const uint8_t PWM_PIN = PA8;
+const uint8_t DIR1 = PB0;
+const uint8_t DIR2 = PB1;
+
+volatile int32_t encoder_ticks = 0;
+
+const float TICKS_PER_REV = 600.0f; // ต้องวัด/ดู Datasheet
+const uint32_t CONTROL_US = 20000; // 50 Hz
+const int PWM_LIMIT = 180;         // เริ่มต่ำเพื่อความปลอดภัย
+
+float target_rpm = 60.0f;
+float kp = 1.2f;
+float ki = 0.8f;
+float kd = 0.02f;
+float integral = 0.0f;
+float previous_error = 0.0f;
+int32_t previous_ticks = 0;
+uint32_t previous_us = 0;
+
+void encoderISR() {
+  encoder_ticks += digitalRead(ENCB) ? 1 : -1;
+}
+
+void setMotor(int command) {
+  command = constrain(command, -PWM_LIMIT, PWM_LIMIT);
+  if (command &gt; 0) {
+    digitalWrite(DIR1, HIGH);
+    digitalWrite(DIR2, LOW);
+  } else if (command &lt; 0) {
+    digitalWrite(DIR1, LOW);
+    digitalWrite(DIR2, HIGH);
+  } else {
+    digitalWrite(DIR1, LOW);
+    digitalWrite(DIR2, LOW);
+  }
+  analogWrite(PWM_PIN, abs(command));
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(ENCA, INPUT_PULLUP);
+  pinMode(ENCB, INPUT_PULLUP);
+  pinMode(PWM_PIN, OUTPUT);
+  pinMode(DIR1, OUTPUT);
+  pinMode(DIR2, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(ENCA), encoderISR, RISING);
+  setMotor(0);
+  previous_us = micros();
+}
+
+void loop() {
+  const uint32_t now_us = micros();
+  const uint32_t elapsed_us = now_us - previous_us;
+  if (elapsed_us &lt; CONTROL_US) return;
+  previous_us = now_us;
+  const float dt = elapsed_us * 1.0e-6f;
+
+  // คัดลอกค่าหลาย Byte จาก ISR แบบ Atomic
+  noInterrupts();
+  const int32_t ticks = encoder_ticks;
+  interrupts();
+
+  const int32_t delta_ticks = ticks - previous_ticks;
+  previous_ticks = ticks;
+  const float rpm = (delta_ticks / TICKS_PER_REV) * (60.0f / dt);
+
+  const float error = target_rpm - rpm;
+  integral += error * dt;
+  integral = constrain(integral, -100.0f, 100.0f); // Anti-windup
+  const float derivative = (error - previous_error) / dt;
+  previous_error = error;
+
+  float output = kp * error + ki * integral + kd * derivative;
+  output = constrain(output, -PWM_LIMIT, PWM_LIMIT);
+  setMotor((int)output);
+
+  Serial.print(target_rpm); Serial.print(&#x27;,&#x27;);
+  Serial.print(rpm); Serial.print(&#x27;,&#x27;);
+  Serial.println(output);
+}</div>
+    </div>
+
+    <div class="section-box">
+        <h3>4. อธิบาย Code ทีละส่วน</h3>
+        <ul>
+            <li><code>volatile</code> แจ้ง Compiler ว่าค่าอาจเปลี่ยนจาก ISR แต่ไม่ได้ทำให้การอ่านหลาย Byte เป็น Atomic จึงคัดลอกภายใต้ <code>noInterrupts()</code></li>
+            <li><code>micros()</code> ใช้คำนวณ <code>dt</code> จริง การลบ unsigned รองรับการวนกลับของ Timer ตามกฎ arithmetic</li>
+            <li>Integral ใช้ <code>error * dt</code> และถูก Clamp ลด Integral windup เมื่อ Output ชนขีดจำกัด</li>
+            <li>Derivative หารด้วย <code>dt</code> จึงไม่เปลี่ยนตามอัตรา Loop แต่ไวต่อ Noise; ของจริงอาจต้อง Low-pass filter</li>
+            <li>PWM limit เริ่มที่ 180/255 ลดความเสี่ยงช่วงจูน</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>5. ตรวจ Encoder ก่อนเปิด PID</h3>
+        <ol>
+            <li>ตั้ง <code>target_rpm = 0</code> และยืนยันว่ามอเตอร์หยุด</li>
+            <li>หมุนล้อด้วยมือ ดู <code>encoder_ticks</code> เพิ่มเมื่อล้อเดินหน้าและลดเมื่อถอยหลัง</li>
+            <li>หมุนครบหนึ่งรอบ วัด Tick แล้วแก้ <code>TICKS_PER_REV</code></li>
+            <li>สั่ง PWM คงที่ชั่วคราว ตรวจเครื่องหมาย RPM ให้ตรงทิศทาง</li>
+        </ol>
+<div class="success-box"><strong>✅ Expected Result:</strong> หมุนล้อหนึ่งรอบได้ Tick ใกล้ค่าที่กำหนด และ RPM กลับใกล้ศูนย์เมื่อหยุด</div>
+    </div>
+
+    <div class="section-box">
+        <h3>6. วิธีจูน PID แบบปลอดภัย</h3>
+        <ol>
+            <li>เริ่ม <code>ki=0</code>, <code>kd=0</code></li>
+            <li>เพิ่ม Kp ทีละน้อยจนตอบสนองเร็วแต่ยังไม่สั่นต่อเนื่อง</li>
+            <li>เพิ่ม Ki เล็กน้อยจน Steady-state error ลดลง</li>
+            <li>เพิ่ม Kd เฉพาะเมื่อ Overshoot/การแกว่งต้องการ Damping และสัญญาณ Encoder ไม่ Noise มาก</li>
+            <li>ทดสอบหลาย Setpoint และมีโหลดจริง</li>
+        </ol>
+        <p>ใช้ Serial Plotter โดยข้อมูลแต่ละบรรทัดเป็น <code>target,rpm,output</code></p>
+    </div>
+
+    <div class="section-box">
+        <h3>7. เชื่อมกับ ROS 2</h3>
+        <p>นำหลักจาก EP7 มาเพิ่ม Packet สำหรับ Setpoint และ Telemetry:</p>
+<div class="table-wrap"><table>
+<thead><tr><th>CMD</th><th>ทิศทาง</th><th>Payload</th></tr></thead>
+<tbody>
+<tr><td><code>0x10</code></td><td>ROS 2 → STM32</td><td>target_left_rpm, target_right_rpm</td></tr>
+<tr><td><code>0x11</code></td><td>STM32 → ROS 2</td><td>measured_rpm, pwm, error</td></tr>
+</tbody></table></div>
+<div class="alert-box">ฝั่ง ROS 2 ควรส่ง Setpoint ที่อัตราคงที่และ STM32 ต้องมี <strong>Watchdog</strong>: หากไม่ได้รับคำสั่งเกิน 300–500 ms ให้ตั้งเป้าเป็นศูนย์</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 8.1 — Step Response</h3>
+<div class="lab-box">        <ol>
+            <li>บันทึก Target/RPM/Output ที่ 0 → 60 RPM</li>
+            <li>วัด Rise time, Overshoot และ Steady-state error</li>
+            <li>เพิ่มโหลดเบา ๆ แล้วเปรียบเทียบก่อน/หลังใช้ Ki</li>
+            <li>บันทึกค่าคงที่และกราฟในรายงาน</li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่านตัวอย่าง:</strong> Steady-state error &lt; 5%, ไม่มี Oscillation ต่อเนื่อง และหยุดได้เมื่อ Watchdog Timeout</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td>RPM กระโดดสูง</td><td>ตรวจ TICKS_PER_REV, dt, Noise และสาย Encoder</td></tr>
+<tr><td>มอเตอร์เร่งสวนทาง</td><td>กลับเครื่องหมาย Encoder หรือทิศ Motor ให้ Feedback เป็นลบ</td></tr>
+<tr><td>Output ค้างสุด</td><td>ลด Ki, จำกัด Integral และตรวจ Setpoint/หน่วย</td></tr>
+<tr><td>Derivative แกว่ง</td><td>ลด Kd, กรอง RPM หรือเพิ่มช่วง Sampling</td></tr>
+<tr><td>อ่าน Tick เพี้ยนสุ่ม</td><td>คัดลอกค่าจาก ISR แบบ Atomic และทำ ISR ให้สั้น</td></tr>
+</tbody></table></div>
+    </div>
+
+</body>
+</html>

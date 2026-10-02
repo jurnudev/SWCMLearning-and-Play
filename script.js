@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if games data exists
+    // Check if games / lessons data exists
     const gamesData = typeof games !== 'undefined' ? games : [];
+    const lessonsData = typeof lessons !== 'undefined' ? lessons : [];
+    const toolsData = typeof tools !== 'undefined' ? tools : [];
     
     // Status Translation Config
     const statusConfig = {
@@ -149,6 +151,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Render Lessons (separate from games: no search/filter, own data file)
+    const renderLessons = () => {
+        const grid = document.getElementById('lesson-grid');
+        const counter = document.getElementById('lesson-counter');
+        const sorted = [...lessonsData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        counter.textContent = `บทเรียนทั้งหมด: ${sorted.length}`;
+        grid.innerHTML = sorted.map(lesson => createGameCard({ ...lesson, buttonText: lesson.buttonText || 'เข้าดูบทเรียน' })).join('');
+    };
+
+    // Render Tools (separate section, own data file)
+    const renderTools = () => {
+        const grid = document.getElementById('tool-grid');
+        const counter = document.getElementById('tool-counter');
+        const sorted = [...toolsData].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        counter.textContent = `เครื่องมือทั้งหมด: ${sorted.length}`;
+        grid.innerHTML = sorted.map(tool => createGameCard({ ...tool, buttonText: tool.buttonText || 'เปิดเครื่องมือ' })).join('');
+    };
+
     // Event Listeners
     searchInput.addEventListener('input', (e) => {
         currentSearch = e.target.value;
@@ -163,4 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     generateFilters();
     renderGames();
+    renderLessons();
+    renderTools();
 });

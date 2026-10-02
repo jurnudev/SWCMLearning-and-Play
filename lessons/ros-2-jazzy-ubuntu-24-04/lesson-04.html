@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EP4 - พื้นฐานการสื่อสาร Nodes และ Topics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f9fafb;
+        }
+        h1, h2, h3, h4 { color: #111827; }
+        .cover-img {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            text-align: center;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        .section-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .alert-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            text-align: left;
+        }
+        th { background-color: #f3f4f6; }
+        .placeholder-img {
+            width: 100%;
+            height: 180px;
+            background-color: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-size: 14px;
+            border: 2px dashed #cbd5e1;
+        }
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .flex-item {
+            flex: 1 1 300px;
+            background: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background-color: #2563eb;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #1e40af;
+        }
+            .success-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .lab-box {
+            background-color: #fffbeb;
+            border: 2px dashed #f59e0b;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .table-wrap { overflow-x: auto; }
+        .diagram {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep4.jpg" alt="หน้าปก EP4 - พื้นฐานการสื่อสาร Nodes และ Topics">
+
+    <h1 class="hero-title">EP4</h1>
+    <h2 style="text-align: center;">พื้นฐานการสื่อสาร Nodes และ Topics</h2>
+    <p class="subtitle">"ให้โปรแกรมย่อยของหุ่นยนต์คุยกันได้ผ่าน Topic"</p>
+
+    <div class="section-box">
+        <h3>🎯 จุดประสงค์การเรียนรู้</h3>
+        <ul>
+            <li>อธิบายหน้าที่ของ Node, Topic, Publisher, Subscriber และ Message Type ได้</li>
+            <li>ใช้คำสั่ง <code>ros2 node</code>, <code>ros2 topic</code> และ <code>rqt_graph</code> เพื่อตรวจสอบระบบได้</li>
+            <li>ส่งและรับข้อความผ่าน Topic ด้วยคำสั่ง Terminal ได้</li>
+            <li>ตั้งค่า <code>ROS_DOMAIN_ID</code> สำหรับการเรียนในห้องที่มีหลายทีมได้</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>📚 1. แนวคิดพื้นฐาน</h3>
+        <div class="flex-container">
+            <div class="flex-item">
+                <h4>Node</h4>
+                <p>โปรแกรมย่อยที่รับผิดชอบงานหนึ่งอย่าง เช่น อ่าน LiDAR หรือควบคุมมอเตอร์</p>
+            </div>
+            <div class="flex-item">
+                <h4>Topic</h4>
+                <p>ช่องทางส่งข้อมูลแบบต่อเนื่อง เหมาะกับข้อมูลเซนเซอร์และคำสั่งความเร็ว</p>
+            </div>
+            <div class="flex-item">
+                <h4>Publisher</h4>
+                <p>Node ฝั่งส่งข้อมูลเข้า Topic</p>
+            </div>
+            <div class="flex-item">
+                <h4>Subscriber</h4>
+                <p>Node ฝั่งรับข้อมูลจาก Topic ผ่าน Callback</p>
+            </div>
+            <div class="flex-item">
+                <h4>Message Type</h4>
+                <p>รูปแบบข้อมูลที่ทั้งผู้ส่งและผู้รับต้องใช้ตรงกัน</p>
+            </div>
+            <div class="flex-item">
+                <h4>QoS</h4>
+                <p>กติกาการส่งข้อมูล เช่น ความน่าเชื่อถือและจำนวนข้อมูลที่เก็บในคิว</p>
+            </div>
+        </div>
+        <img class="diagram" src="../../assets/lessons/ep4-pubsub.png" alt="Publisher /talker ส่งข้อมูลเข้า Topic /chatter และ Subscriber หลายตัวรับข้อมูลเดียวกัน">
+        <h4>ตัวอย่างการไหลของข้อมูล</h4>
+<div class="code-block">camera_node → /camera/image_raw (sensor_msgs/msg/Image) → vision_node
+
+teleop_node → /cmd_vel (geometry_msgs/msg/Twist) → motor_controller</div>
+    </div>
+
+    <div class="section-box">
+        <h3>💻 2. เตรียม Terminal</h3>
+        <p>ทุก Terminal ใหม่ต้อง Source ROS 2 ก่อน หากได้เพิ่มคำสั่งไว้ใน <code>~/.bashrc</code> แล้ว ขั้นตอนนี้จะทำอัตโนมัติ</p>
+<div class="code-block"># ROS 2 Jazzy บน Ubuntu 24.04
+source /opt/ros/jazzy/setup.bash
+
+# ตรวจสอบเวอร์ชัน Distribution
+echo $ROS_DISTRO
+# Expected: jazzy</div>
+<div class="highlight">ใช้ Humble ให้เปลี่ยน <code>jazzy</code> เป็น <code>humble</code></div>
+<div class="alert-box"><strong>⚠️ อย่านำ Environment ของ Humble และ Jazzy มา Source ซ้อนกันใน Terminal เดียว</strong></div>
+    </div>
+
+    <div class="section-box">
+        <h3>⌨️ 3. ทดลองระบบ Talker/Listener</h3>
+        <h4>Terminal 1 — Publisher ตัวอย่าง</h4>
+<div class="code-block">source /opt/ros/jazzy/setup.bash
+ros2 run demo_nodes_cpp talker</div>
+        <h4>Terminal 2 — Subscriber ตัวอย่าง</h4>
+<div class="code-block">source /opt/ros/jazzy/setup.bash
+ros2 run demo_nodes_py listener</div>
+<div class="success-box"><strong>✅ Expected Result</strong><br>Terminal 1 แสดงข้อความ <code>Publishing</code> และ Terminal 2 แสดง <code>I heard</code> พร้อมลำดับข้อความที่เพิ่มขึ้นต่อเนื่อง</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🔍 4. ตรวจสอบ Node</h3>
+<div class="code-block"># แสดง Node ทั้งหมด
+ros2 node list
+
+# ดูรายละเอียด Node
+ros2 node info /talker
+ros2 node info /listener</div>
+<div class="highlight">ในผลลัพธ์ของ <code>ros2 node info</code> ให้สังเกต Subscribers, Publishers, Service Servers, Service Clients และ Action Servers/Clients</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🔍 5. ตรวจสอบ Topic</h3>
+<div class="code-block"># แสดง Topic ทั้งหมด
+ros2 topic list
+
+# แสดง Topic พร้อม Message Type
+ros2 topic list -t
+
+# ดูรายละเอียดการเชื่อมต่อ
+ros2 topic info /chatter --verbose
+
+# ดูข้อมูลจริง
+ros2 topic echo /chatter
+
+# ดูอัตราการส่งข้อมูล
+ros2 topic hz /chatter
+
+# ดูแบนด์วิดท์โดยประมาณ
+ros2 topic bw /chatter</div>
+    </div>
+
+    <div class="section-box">
+        <h3>📦 6. ตรวจสอบ Message Type</h3>
+<div class="code-block"># ตรวจชนิดข้อมูลของ Topic
+ros2 topic type /chatter
+
+# ดูโครงสร้าง Message
+ros2 interface show std_msgs/msg/String
+
+# ค้นหารายการ Interface
+ros2 interface list</div>
+<div class="table-wrap"><table>
+<thead><tr><th>Message Type</th><th>เหมาะกับ</th><th>ฟิลด์สำคัญ</th></tr></thead>
+<tbody>
+<tr><td><code>std_msgs/msg/String</code></td><td>ข้อความทดลอง</td><td>data</td></tr>
+<tr><td><code>std_msgs/msg/Float32</code></td><td>ค่าอุณหภูมิ</td><td>data</td></tr>
+<tr><td><code>geometry_msgs/msg/Twist</code></td><td>คำสั่งความเร็ว</td><td>linear, angular</td></tr>
+<tr><td><code>sensor_msgs/msg/LaserScan</code></td><td>LiDAR 2D</td><td>ranges, angle_min, angle_increment</td></tr>
+</tbody></table></div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 7. Publish ข้อมูลจาก Terminal</h3>
+        <h4>ส่งข้อความหนึ่งครั้ง</h4>
+<div class="code-block">ros2 topic pub --once /class_message std_msgs/msg/String &quot;{data: &#x27;Hello ROS 2 Jazzy&#x27;}&quot;</div>
+        <h4>ส่งค่าอุณหภูมิที่ 1 Hz</h4>
+<div class="code-block">ros2 topic pub --rate 1 /temperature std_msgs/msg/Float32 &quot;{data: 28.5}&quot;</div>
+        <h4>ส่งคำสั่งให้หุ่นยนต์เดินหน้า</h4>
+<div class="code-block">ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/Twist &quot;{linear: {x: 0.2, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0.0}}&quot;</div>
+<div class="alert-box"><strong>⚠️ ความปลอดภัย</strong><br>ก่อนส่ง <code>/cmd_vel</code> ให้ยกล้อหุ่นยนต์พ้นพื้นหรือเตรียมปุ่มหยุดฉุกเฉิน เมื่อทดสอบเสร็จให้กด <code>Ctrl+C</code> และส่งค่าความเร็วศูนย์หาก Controller ไม่หยุดเอง</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 4.1 — Temperature Topic</h3>
+<div class="lab-box">        <p><strong>โจทย์:</strong> สร้าง Publisher จาก Terminal ที่ส่งอุณหภูมิ 30.0°C ไปยัง <code>/temperature</code> ด้วย <code>std_msgs/msg/Float32</code> ที่ 1 Hz</p>
+        <ol>
+            <li>เปิด Terminal 1 แล้วใช้ <code>ros2 topic pub</code></li>
+            <li>เปิด Terminal 2 แล้วใช้ <code>ros2 topic echo /temperature</code></li>
+            <li>ตรวจอัตราด้วย <code>ros2 topic hz /temperature</code></li>
+            <li>ตรวจชนิดด้วย <code>ros2 topic type /temperature</code></li>
+        </ol>
+<div class="success-box"><strong>เกณฑ์ผ่าน:</strong> เห็น <code>data: 30.0</code> ทุกประมาณ 1 วินาที และชนิดข้อมูลตรงตามโจทย์</div>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🧪 LAB 4.2 — สำรวจระบบ</h3>
+<div class="lab-box">        <p>ขณะ talker และ listener ทำงาน ให้บันทึกผลจากคำสั่งต่อไปนี้</p>
+        <ol>
+            <li><code>ros2 node list</code></li>
+            <li><code>ros2 topic list -t</code></li>
+            <li><code>ros2 node info /talker</code></li>
+            <li><code>ros2 topic info /chatter --verbose</code></li>
+        </ol>
+        <p>วาดแผนภาพ Node → Topic → Node และระบุ Message Type กำกับ</p>
+</div>
+    </div>
+
+    <div class="section-box">
+        <h3>🌐 8. การสื่อสารหลายเครื่อง</h3>
+        <p>เครื่องต้องอยู่ในเครือข่ายที่อนุญาต multicast/UDP และใช้ <code>ROS_DOMAIN_ID</code> เดียวกัน</p>
+<div class="code-block"># ตัวอย่างเลือก Domain 25 — ทำเหมือนกันทุกเครื่องในทีม
+export ROS_DOMAIN_ID=25
+
+# บันทึกถาวรสำหรับผู้ใช้ปัจจุบัน
+echo &quot;export ROS_DOMAIN_ID=25&quot; &gt;&gt; ~/.bashrc
+source ~/.bashrc
+
+# ตรวจสอบ
+echo $ROS_DOMAIN_ID</div>
+<div class="alert-box"><strong>เครือข่ายองค์กรหรือ Guest Wi-Fi อาจปิด multicast</strong><br>ถ้าไม่ค้นพบกัน ให้ทดสอบบนเราเตอร์/LAN เดียวกัน ตรวจ Firewall และตรวจว่า <code>ROS_DOMAIN_ID</code> ตรงกันก่อน</div>
+    </div>
+
+    <div class="section-box">
+        <h3>⚠️ 9. Common Problems</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>อาการ</th><th>ตรวจสอบ</th><th>แนวทางแก้</th></tr></thead>
+<tbody>
+<tr><td><code>ros2: command not found</code></td><td>echo $ROS_DISTRO</td><td>Source /opt/ros/jazzy/setup.bash</td></tr>
+<tr><td><code>ไม่เห็น Topic ของอีกเครื่อง</code></td><td>Domain, Network, Firewall</td><td>ใช้ Domain เดียวกันและทดสอบ LAN ที่รองรับ multicast</td></tr>
+<tr><td><code>Topic ชื่อเดียวกันแต่คุยไม่ได้</code></td><td>ros2 topic list -t</td><td>ตรวจ Message Type และ QoS ให้เข้ากัน</td></tr>
+<tr><td><code>ข้อมูลเร็วเกินไป</code></td><td>ros2 topic hz</td><td>ลด publish rate หรือออกแบบ QoS ให้เหมาะสม</td></tr>
+</tbody></table></div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>EP10 - Kinematics ล้อแบบต่างๆ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <style>body{font-family:Kanit,sans-serif;line-height:1.6;color:#333;max-width:800px;margin:0 auto;padding:2rem;background-color:#f9fafb}h1,h2,h3,h4{color:#111827}.cover-img{display:block;width:100%;max-width:520px;aspect-ratio:1/1;object-fit:cover;margin-left:auto;margin-right:auto;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.12);margin-bottom:1.5rem}.hero-title{text-align:center;color:#2563eb;margin-bottom:.5rem}.subtitle{text-align:center;color:#4b5563;font-style:italic;margin-bottom:2rem}.section-box{background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem}.highlight{background-color:#eff6ff;border-left:4px solid #3b82f6;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.alert-box{background-color:#fef2f2;border-left:4px solid #ef4444;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.code-block{background-color:#1e1e1e;color:#d4d4d4;padding:1rem;border-radius:6px;font-family:monospace;overflow-x:auto;margin:.75rem 0;white-space:pre-wrap;font-size:.9rem}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{border:1px solid #e5e7eb;padding:.75rem;text-align:left}th{background-color:#f3f4f6}.placeholder-img{width:100%;height:180px;background-color:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;border-radius:8px;margin:1rem 0;font-size:14px;border:2px dashed #cbd5e1}.flex-container{display:flex;flex-wrap:wrap;gap:1rem;margin-top:1rem}.flex-item{flex:1 1 300px;background:#f8fafc;padding:1.25rem;border-radius:8px;border:1px solid #e2e8f0}.step-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background-color:#2563eb;color:#fff;border-radius:50%;font-size:.85rem;font-weight:700;margin-right:.5rem}code{background:#f1f5f9;padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.9em;color:#1e40af}.success-box{background-color:#f0fdf4;border-left:4px solid #22c55e;padding:1rem;margin:1rem 0;border-radius:0 8px 8px 0}.lab-box{background-color:#fffbeb;border:2px dashed #f59e0b;padding:1.25rem;border-radius:8px;margin:1rem 0}.table-wrap{overflow-x:auto}.diagram{display:block;width:100%;height:auto;border-radius:10px;margin:1rem 0;box-shadow:0 4px 12px rgba(0,0,0,.15)}.formula{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem 1rem;margin:1rem 0;overflow-x:auto}</style>
+</head>
+<body>
+
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+    <img class="cover-img" src="../../assets/lessons/ros2-jazzy-ep10.jpg" alt="หน้าปก EP10 - Wheel Kinematics">
+
+    <h1 class="hero-title">EP10</h1>
+    <h2 style="text-align:center">Kinematics ล้อแบบต่างๆ</h2>
+    <p class="subtitle">"แปลงคำสั่งความเร็ว (Twist) ให้กลายเป็นการหมุนของแต่ละล้อ"</p>
+
+    <div class="section-box">
+        <h3>📐 Kinematics คืออะไร?</h3>
+        <p>ใน ROS 2 คำสั่งที่ควบคุมหุ่นยนต์ให้เคลื่อนที่จะมาในรูปแบบข้อความ <code>geometry_msgs/Twist</code> ซึ่งประกอบไปด้วยความเร็วแนวตรง (Linear Velocity - $v$) และความเร็วในการหมุน (Angular Velocity - $\omega$)</p>
+        <p>แต่ในระดับฮาร์ดแวร์ มอเตอร์ของเราไม่รู้จักคำสั่งเหล่านี้ <strong>Kinematics (จลนศาสตร์)</strong> จึงเป็นสมการคณิตศาสตร์ที่ใช้<strong>แปลง (Transform)</strong> ความเร็วรวมของหุ่นยนต์ ให้เป็นความเร็วของมอเตอร์แต่ละตัว โดยหุ่นยนต์แต่ละประเภทก็จะมีสมการที่แตกต่างกันออกไป</p>
+    </div>
+
+    <div class="section-box">
+        <h3>1️⃣ ล้อขับเคลื่อนอิสระซ้าย-ขวา (Differential Drive)</h3>
+        <p>นี่คือรูปแบบที่ได้รับความนิยมที่สุดในหุ่นยนต์พื้นฐาน (เช่น หุ่นยนต์ดูดฝุ่น หรือ TurtleBot) ประกอบไปด้วยล้อขับเคลื่อนหลัก 2 ล้อ (ซ้าย-ขวา) และล้อประคอง (Caster wheel) หุ่นยนต์สามารถหมุนรอบตัวเอง (Zero-turning radius) ได้โดยการหมุนล้อซ้ายและขวาไปในทิศทางตรงข้ามกัน</p>
+        <img class="diagram" src="../../assets/lessons/ep10-differential-drive.png" alt="หุ่นยนต์แบบ Differential Drive แสดงล้อซ้าย ล้อขวา และระยะห่างระหว่างล้อ (Track Width)">
+        <h4>สมการ Kinematics พื้นฐาน:</h4>
+        <div class="formula">
+            <p>$V_{right} = v + \left(\frac{\omega \times L}{2}\right)$</p>
+            <p>$V_{left} = v - \left(\frac{\omega \times L}{2}\right)$</p>
+        </div>
+        <ul>
+            <li>$v$ = ความเร็วเดินหน้า, $\omega$ = ความเร็วหมุนรอบตัว</li>
+            <li>$L$ = ระยะห่างระหว่างล้อทั้งสอง (Track Width)</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>2️⃣ ล้อเมคานัม / โอมนิ (Mecanum / Omni Drive)</h3>
+        <p>หุ่นยนต์ที่ใช้ล้อประเภทนี้เรียกว่ารถ <strong>Holonomic</strong> ซึ่งหมายความว่ามันสามารถเคลื่อนที่ไปด้านข้าง (สไลด์ปู หรือ Strafe) หรือทแยงมุมได้ทันทีโดยไม่ต้องหันหน้าไปทางนั้น ล้อแต่ละล้อจะมีลูกกลิ้งเล็กๆ เอียงทำมุม 45 องศาติดอยู่รอบๆ มักใช้ล้อ 4 ล้อ ควบคุมแยกกันอิสระ 4 มอเตอร์</p>
+        <img class="diagram" src="../../assets/lessons/ep10-mecanum-drive.png" alt="ล้อ Mecanum 4 ล้อที่มีลูกกลิ้งเอียง 45 องศา พร้อมเวกเตอร์ความเร็ว">
+        <h4>สมการ Kinematics พื้นฐาน (สำหรับ 4 ล้อ Mecanum):</h4>
+        <div class="formula">
+            <p>$V_{front\_left} = v_x - v_y - \omega(l_x + l_y)$</p>
+            <p>$V_{front\_right} = v_x + v_y + \omega(l_x + l_y)$</p>
+            <p>$V_{rear\_left} = v_x + v_y - \omega(l_x + l_y)$</p>
+            <p>$V_{rear\_right} = v_x - v_y + \omega(l_x + l_y)$</p>
+        </div>
+        <ul>
+            <li>$v_x$ = ความเร็วเดินหน้า, $v_y$ = ความเร็วสไลด์ข้าง</li>
+            <li>$l_x, l_y$ = ระยะห่างจากจุดศูนย์กลางหุ่นยนต์ถึงล้อ</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>3️⃣ ระบบเลี้ยวแบบรถยนต์ (Ackermann Steering)</h3>
+        <p>เป็นระบบการขับเคลื่อนแบบเดียวกับรถยนต์ทั่วไป (Non-holonomic) ล้อหลังทำหน้าที่ขับเคลื่อนไปข้างหน้า/หลัง (ด้วยมอเตอร์หลัก) ส่วนล้อหน้าทำหน้าที่บังคับเลี้ยวซ้าย/ขวา (มักใช้ Servo motor) ข้อเสียคือไม่สามารถหมุนอยู่กับที่ (Zero-turn) ได้ ต้องตีวงเลี้ยว</p>
+        <img class="diagram" src="../../assets/lessons/ep10-ackermann-steering.png" alt="โครงสร้างรถแบบ Ackermann แสดงล้อหน้าเลี้ยวโดยองศาล้อด้านในและด้านนอกไม่เท่ากัน">
+        <h4>การคำนวณพื้นฐาน:</h4>
+        <p>แตกต่างจากแบบอื่นตรงที่ต้องแปลงความเร็วหมุน $\omega$ ให้กลายเป็น <strong>มุมเลี้ยว (Steering Angle) $\delta$</strong> ของ Servo:</p>
+        <div class="formula">
+            <p>$V_{motor} = v$ (มอเตอร์หลังหมุนตามความเร็ว Linear)</p>
+            <p>$\delta = \arctan\left(\frac{\omega \times L}{v}\right)$ (มุมเลี้ยวล้อหน้า)</p>
+        </div>
+        <ul>
+            <li>$L$ = ระยะห่างระหว่างเพลาล้อหน้ากับล้อหลัง (Wheelbase)</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h3>🎯 สรุปบทเรียน</h3>
+<div class="highlight">การเลือกรูปแบบล้อ (Kinematics) ส่งผลโดยตรงต่อการเขียนโค้ดเพื่อแปลงคำสั่ง <code>cmd_vel</code> ให้มอเตอร์ทำงาน ใน EP ถัดไป เราจะนำสมการ Differential Drive มาเขียนลงใน ROS 2 เพื่อให้หุ่นยนต์ของเราวิ่งได้จริง!</div>
+    </div>
+
+    <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script defer="defer" src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload='renderMathInElement(document.body,{delimiters:[{left:"$",right:"$",display:!1}]})'></script>
+</body>
+</html>

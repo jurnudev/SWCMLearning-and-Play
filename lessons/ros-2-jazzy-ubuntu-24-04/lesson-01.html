@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson 01 - ทำความรู้จัก ROS 2 Jazzy</title>
+    <title>EP1 - ทำความรู้จัก ROS 2 Jazzy</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="back-button.css">
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -65,11 +66,28 @@
             font-size: 14px;
             border: 2px dashed #cbd5e1;
         }
+        .diagram {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
 
-    <h1 class="hero-title">Lesson 01</h1>
+    <a href="index.html" class="lesson-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        ย้อนกลับ
+    </a>
+
+
+    <h1 class="hero-title">EP1</h1>
     <h2 style="text-align: center;">ทำความรู้จัก ROS 2 Jazzy</h2>
     <p class="subtitle">"จาก Humble สู่ Jazzy — ก้าวสำคัญของหุ่นยนต์อัจฉริยะบน Ubuntu 24.04"</p>
 
@@ -83,7 +101,7 @@
         <div class="highlight">
             "หากหุ่นยนต์คือบริษัท ROS 2 ก็คือ ระบบเครือข่ายภายใน ที่ทำให้แผนกต่างๆ ส่งเอกสารหากันได้อย่างรวดเร็วและไม่ตกหล่น"
         </div>
-        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ ]</div>
+        <img class="diagram" src="../../assets/lessons/ep1-ros2-company.png" alt="ROS 2 เป็นระบบสื่อสารกลางที่เชื่อมตา (LiDAR/Camera) สมอง (Mini PC) และล้อ (STM32) เข้าด้วยกัน">
     </div>
 
     <div class="section-box">
@@ -94,7 +112,7 @@
             <li><strong>ประสิทธิภาพสูงขึ้น:</strong> ปรับปรุงระบบ DDS (Middleware) ให้รับส่งข้อมูลได้นิ่งและเสถียรกว่าเดิม</li>
             <li><strong>Hardware ใหม่ๆ:</strong> รองรับ Driver เซนเซอร์รุ่นใหม่ และบอร์ดประมวลผลแรงๆ ได้ดีขึ้น</li>
         </ul>
-        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ ]</div>
+        <img class="diagram" src="../../assets/lessons/ep1-jazzy-lts.png" alt="ROS 2 Jazzy Jalisco ออกแบบมาคู่กับ Ubuntu 24.04 LTS และได้รับการซัพพอร์ตระยะยาวถึงปี 2029">
     </div>
 
     <div class="section-box">
@@ -145,7 +163,7 @@
             <li>👨‍🎓 <strong>สำหรับนักเรียน:</strong> ได้เรียนรู้มาตรฐานสากลที่บริษัทระดับโลกใช้งาน สร้างโปรไฟล์ให้โดดเด่นในอนาคต</li>
             <li>💼 <strong>สำหรับบุคลากร:</strong> เพิ่มมูลค่าทักษะ (Upskill) ให้ทันการเปลี่ยนผ่านสู่ระบบอัตโนมัติในโรงงานอัจฉริยะ</li>
         </ul>
-        <div class="placeholder-img">[ กราฟิกแสดงการเชื่อมต่อ ]</div>
+        <img class="diagram" src="../../assets/lessons/ep1-education.png" alt="ประโยชน์ของ ROS 2 ต่อคุณครู นักเรียน และบุคลากร">
     </div>
 
     <div class="section-box">
